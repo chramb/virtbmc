@@ -9,10 +9,16 @@ from typing import TYPE_CHECKING
 from virtbmc_core.config import CONFIG
 
 if TYPE_CHECKING:
+    from argparse import Namespace
+    from logging import Logger
     from typing import Optional, Sequence
 
-_ = CONFIG  # configures everything before starting app
-log = logging.getLogger("virtbmc.core")
+    from virtbmc_core.model import AppConfig
+
+_: AppConfig = CONFIG  # configures everything before starting app
+
+# The only place wher logger isn't __name__ since it can be __main__ here
+log: Logger = logging.getLogger("virtbmc.core")
 
 
 def main(args: Optional[Sequence] = None) -> None:
@@ -21,15 +27,14 @@ def main(args: Optional[Sequence] = None) -> None:
     parser.add_argument("-V", "--version", action="version", version=importlib.metadata.version("virtbmc_core")) # noqa: E501
     parser.add_argument("--debug", action="store_true")
     # fmt: on
-    parsed = parser.parse_args(args[1:] if args else None)
+    parsed: Namespace = parser.parse_args(args[1:] if args else None)
     if parsed.debug:
         logging.getLogger("virtbmc.core").setLevel(logging.DEBUG)
         log.debug("Enabled debugging from cli")
     try:
         # DO Stuff
-        from virtbmc_core.model.bmc_config import BmcConfig
+        import virtbmc_core.driver
 
-        print(vars(BmcConfig("hello", driver={"A:": 1})))
     except KeyboardInterrupt:
         log.debug("received keyboard interrupt, exiting")
 

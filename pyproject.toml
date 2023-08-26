@@ -1,0 +1,25 @@
+
+[tool.mypy]
+mypy_path = "stubs"
+ignore_missing_imports = true
+allow_redefinition = true
+enable_error_code = [
+    "ignore-without-code", # tells Mypy that all ignore comments need specific error codes
+]
+show_error_codes = true # tells Mypy that all ignore comments need specific error codes
+warn_unused_ignores = true # tells Mypy to log errors for unnecessary ignore comments
+strict = true
+
+[tool.isort]
+profile = "black"
+add_imports = "from __future__ import annotations"
+skip = "_version.py,__init__.py,tests,stubs"
+
+[tool.ruff]
+extend-select = ["C4", "SIM", "TCH", "W"] # default: E,F; isort: "I001"
+show-fixes = true
+src = ["virtualbmc"]
+target-version = "py38"
+
+[tool.ruff.pydocstyle]
+convention = "google-notype"

@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 
 # TODO(logging): to file, single file, config colors
-def configure_logs(config: AppConfig):
+def log_configure(config: AppConfig):
     _a = ANSI_COLORS = {  # noqa F831
         "BRIGHT_BLACK": "\33[30;1m",
         "BRIGHT_RED": "\33[31;1m",
@@ -52,3 +52,8 @@ def configure_logs(config: AppConfig):
     handler.setFormatter(ColorFormatter())
     log.addHandler(handler)
     log.setLevel(level=logging.DEBUG if config.log.debug else logging.INFO)
+
+
+def log_name(__name__: str = "virtbmc") -> str:
+    p = __name__.split(".")
+    return p[0].replace("_", ".") + ".".join(p[1:])

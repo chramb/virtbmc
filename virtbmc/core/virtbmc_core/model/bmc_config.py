@@ -1,22 +1,43 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Any, Dict, Union
+from typing import TypedDict  # Any  # , Dict, Union
 
-from virtbmc_core.config import CONFIG
-
-# TODO(perf): switch all of these to typed dict and apply defaults somewhere else
-
-
-@dataclass
-class BmcDriverConfig:
-    pass
+# class BmcDriverConfig:  # Turn this into typing.protocol in future
+#     def __init__(self):
+#         raise Exception("this class isn't supposed to be used directly")
 
 
-@dataclass
-class BmcConfig:
+class BmcConfig(TypedDict):
     name: str
     # bmcuuid: Optional[str]
-    username: str = "admin"
-    password: str = "password"
-    port: int = 6230
-    address: str = "::"
-    driver: Union[str, Dict[str, Any]] = CONFIG.virtbmc.default_driver
+    username: str
+    password: str
+    port: int
+    address: str
+    driver: str
+    autostart: bool
+
+    # Log { enabled, file/endpoint, level}
+    # driver: Union[str, BmcDriverConfig] = CONFIG.virtbmc.default_driver
+
+
+def bmc_config_init(
+    name: str,
+    # bmcuuid: Optional[str]
+    username: str = "admin",
+    password: str = "password",
+    port: int = 6230,
+    address: str = "::1",
+    driver: str = "",
+    autostart: bool = False,
+) -> BmcConfig:
+    return {
+        "name": name,
+        "username": username,
+        "password": password,
+        "port": port,
+        "address": address,
+        "driver": driver,
+        "autostart": autostart,
+    }
