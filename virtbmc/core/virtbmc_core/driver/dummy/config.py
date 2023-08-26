@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from virtbmc_core.model.bmc_config import BmcConfig
+from virtbmc.core.virtbmc_core.model.bmc_config import BmcConfig
 
 
 @dataclass

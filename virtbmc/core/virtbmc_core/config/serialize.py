@@ -7,8 +7,10 @@ from typing import TYPE_CHECKING, Protocol
 if TYPE_CHECKING:
     from typing import Any, Dict, Protocol, Union
 
-    from virtbmc_core.model.app_config import AppConfig
-    from virtbmc_core.model.bmc_config import BmcConfig
+    import virtbmc_core.model.app_config as app_config
+    import virtbmc_core.model.bmc_config as bmc_config
+
+    AppConfig, BmcConfig = app_config.AppConfig, bmc_config.BmcConfig
 
     # fmt: off
     class ConfigOperations(Protocol):

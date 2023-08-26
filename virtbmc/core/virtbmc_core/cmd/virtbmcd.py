@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from logging import Logger
     from typing import Optional, Sequence
 
-    from virtbmc_core.model import AppConfig
+    from virtbmc_core.model.app_config import AppConfig
 
 _: AppConfig = CONFIG  # configures everything before starting app
 

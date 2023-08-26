@@ -4,7 +4,7 @@ import logging
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from virtbmc_core.model import AppConfig
+    from virtbmc_core.model.app_config import AppConfig
 
 
 # TODO(logging): to file, single file, config colors
@@ -31,7 +31,7 @@ def log_configure(config: AppConfig):
         "UNDERLINE": "\33[4m",
         "REVERSED": "\33[7m",
     }
-    FORMAT = config.log.format
+    FORMAT = config["log"]["format"]
 
     LEVEL_FORMAT = {
         logging.DEBUG: f"{_a['BLUE']}{FORMAT}{_a['RESET']}",
@@ -51,7 +51,7 @@ def log_configure(config: AppConfig):
     handler = logging.StreamHandler()
     handler.setFormatter(ColorFormatter())
     log.addHandler(handler)
-    log.setLevel(level=logging.DEBUG if config.log.debug else logging.INFO)
+    log.setLevel(level=logging.DEBUG if config["log"]["debug"] else logging.INFO)
 
 
 def log_name(__name__: str = "virtbmc") -> str:
