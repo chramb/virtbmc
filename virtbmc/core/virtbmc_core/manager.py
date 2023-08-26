@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 
     import virtbmc_core.model.bmc_config as bmc_config
     from virtbmc_core.driver.base import BaseBMC
+
     BmcConfig = bmc_config.BmcConfig
 
 # All convenience methods to manage BMCs
@@ -21,7 +22,7 @@ available_drivers: Dict[str, importlib.metadata.EntryPoint] = {
 }
 
 
-def bmc_add(config: BmcConfig) -> BaseBMC:
+def add(config: BmcConfig) -> BaseBMC:
     "Creates and saves BMC from given config"
     module: ModuleType = importlib.import_module(
         available_drivers[config["driver"]].load()
@@ -33,24 +34,24 @@ def bmc_add(config: BmcConfig) -> BaseBMC:
     return bmc
 
 
-def bmc_get_config(name: str) -> BmcConfig:
+def get_config(name: str) -> BmcConfig:
     config_dict: BmcConfig = bmc_config.read(file)  # type: ignore
 
     # Can error if saved driver no longer exist
     return config_dict
 
 
-def bmc_get(config: BmcConfig) -> BaseBMC:
+def get(config: BmcConfig) -> BaseBMC:
     return available_drivers[config["driver"]].driver(**config)  # type: ignore
 
 
-def bmc_delete(bmc: BaseBMC) -> None:
+def delete(bmc: BaseBMC) -> None:
     bmc.stop(True)
     bmc_config._bmc_file(bmc.name).unlink()
     return
 
 
-def bmc_load() -> BaseBMC:
+def load() -> BaseBMC:
     file: Path = next(CONFIG["virtbmc"]["config_dir"].iterdir())
     config: BmcConfig = bmc_config.read()  # type: ignore
-    return bmc_get(config)
+    return get(config)
