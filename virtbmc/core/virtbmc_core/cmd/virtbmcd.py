@@ -33,7 +33,9 @@ def main(args: Optional[Sequence] = None) -> None:
         log.debug("Enabled debugging from cli")
     try:
         # DO Stuff
-        import virtbmc_core.driver
+        from virtbmc_core.driver.dummy.driver import DummyBMC
+
+        print(DummyBMC("chris", autostart=True).config())
 
     except KeyboardInterrupt:
         log.debug("received keyboard interrupt, exiting")

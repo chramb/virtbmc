@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import functools
+import threading
+from dataclasses import dataclass, field, fields
 from typing import TYPE_CHECKING, Optional
 
 from pyghmi.ipmi.bmc import Bmc
@@ -31,27 +33,33 @@ def _handle_not_implemented_methods(cls):
 
 
 @_handle_not_implemented_methods
+@dataclass
 class BaseBMC(Bmc):
-    thread: threading.Thread
+    name: str
+    username: str = "admin"
+    password: str = "password"
+    port: int = 6230
+    address: str = "::1"
+    autostart: bool = False
+    bmcuuid: Optional[str] = field(default=None)
 
-    def __init__(
-        self,
-        name: str,
-        username: str = "admin",
-        password: str = "password",
-        port: int = 623,
-        address: str = "::",
-        bmcuuid: Optional[str] = None,
-    ) -> None:
-        self.name = name
-        self.started = False
-        super().__init__({username: password}, port, bmcuuid, address)
+    thread: threading.Thread = field(init=False)
+
+    def __post_init__(self):
+        super().__init__(
+            {self.username: self.password}, self.port, self.bmcuuid, self.address
+        )
+        self.thread = threading.Thread(target=self.start)
 
     def cold_reset(self, managed=False) -> Literal[0]:
         return 0
 
     def start(self, timeout: int) -> None:
-        self.listen()
+        if not self.thread.is_alive():
+            self.listen()
 
     def stop(self, managed: bool = False) -> Literal[0]:
         return self.cold_reset()
+
+    def config(self):
+        return {f.name: getattr(self, f.name) for f in fields(self) if f.init}

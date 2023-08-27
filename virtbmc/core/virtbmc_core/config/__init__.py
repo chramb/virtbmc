@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING
 import os
 from virtbmc_core.log import log_configure
 from virtbmc_core.config.format import read, write
+from pathlib import Path
+from virtbmc_core.model import AppConfig
 
 if TYPE_CHECKING:
-    from virtbmc_core.model import AppConfig
     from typing import List
-    from pathlib import Path
     from typing import Optional
 
 
