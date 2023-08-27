@@ -6,19 +6,19 @@ import logging
 import sys
 from typing import TYPE_CHECKING
 
-from virtbmc_core.config import CONFIG
+from virtbmc.config import CONFIG
 
 if TYPE_CHECKING:
     from argparse import Namespace
     from logging import Logger
     from typing import Optional, Sequence
 
-    from virtbmc_core.model import AppConfig
+    from virtbmc.config import AppConfig
 
 _: AppConfig = CONFIG  # configures everything before starting app
 
 # The only place wher logger isn't __name__ since it can be __main__ here
-log: Logger = logging.getLogger("virtbmc.core")
+log: Logger = logging.getLogger("virtbmc")
 
 
 def main(args: Optional[Sequence] = None) -> None:
@@ -33,9 +33,10 @@ def main(args: Optional[Sequence] = None) -> None:
         log.debug("Enabled debugging from cli")
     try:
         # DO Stuff
-        from virtbmc_core.driver.dummy.driver import DummyBMC
+        from virtbmc.driver.dummy.driver import DummyBMC
 
-        print(DummyBMC("chris", autostart=True).config())
+        bmc = DummyBMC("chris")
+        bmc.start()  # There's no way of stopping bmc in pyghmi?!
 
     except KeyboardInterrupt:
         log.debug("received keyboard interrupt, exiting")

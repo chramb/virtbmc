@@ -2,17 +2,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 import os
-from virtbmc_core.log import log_configure
-from virtbmc_core.config.format import read, write
+from virtbmc.log import log_configure
+from virtbmc.config.format import read, write
 from pathlib import Path
-from virtbmc_core.model import AppConfig
+from virtbmc.config.model import AppConfig
 
 if TYPE_CHECKING:
     from typing import List
     from typing import Optional
 
 
-def get_config_dir() -> Path:
+def get_config_location() -> Path:
     if p := os.environ.get("VIRTBMC_CONFIG", None):
         path: Path = Path(p).expanduser()
 
@@ -38,16 +38,22 @@ def get_config_dir() -> Path:
 # invalid key in section(propagate from Class init)
 # invalid type/value for key
 def get_config() -> AppConfig:
-    config_path: Optional[Path] = get_config_dir()
+    config_path: Optional[Path] = get_config_location()
     if config_path is not None:
+        # if there's dir under that path
         if (config_dir := Path(config_path)).is_dir():
             for ext in ["toml", "json", "yaml", "yml", "ini", "conf"]:
                 if (
                     config_file := (config_dir / "config").with_suffix("." + ext)
                 ).exists():
-                    return AppConfig(**read(config_file.absolute()))
+                    cfg = AppConfig(**read(config_file.absolute()))
+                    cfg.location = config_path
+                    return cfg
+        # if there's file under that path
         else:
-            return AppConfig(**read(Path(config_path)))
+            cfg = AppConfig(**read(config_path.absolute()))
+            cfg.location = config_path.parent
+            return cfg
 
     "return default config"
     return AppConfig()

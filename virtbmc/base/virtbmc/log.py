@@ -4,7 +4,7 @@ import logging
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from virtbmc_core.model import AppConfig
+    from virtbmc.config import AppConfig
 
 
 # TODO(logging): to file, single file, config colors
@@ -54,6 +54,6 @@ def log_configure(config: AppConfig):
     log.setLevel(level=logging.DEBUG if config.log.debug else logging.INFO)
 
 
-def log_name(__name__: str = "virtbmc") -> str:
-    p = __name__.split(".")
-    return p[0].replace("_", ".") + ".".join(p[1:])
+# def log_name(__name__: str = "virtbmc") -> str:
+#     p = __name__.split(".")
+#     return p[0].replace("_", ".") + ".".join(p[1:])

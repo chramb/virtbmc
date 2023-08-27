@@ -29,19 +29,23 @@ Sent cold reset command to MC
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from virtbmc_core.driver.base import BaseBMC
+from virtbmc.driver.base import BaseBMC
 
 log = logging.getLogger("virtbmc.driver.dummy")
 # TODO: Add logs to every command
 
 
-@dataclass
 class DummyBMC(BaseBMC):
-    powerstate: str = "off"
-    bootdevice: str = "default"
+    def __init__(self, name, **kwargs) -> None:
+        self.name = name
+        self.powerstate = "off"
+        self.bootdevice = "default"
+        self.driver = "dummy"
+        log.info(f"{self.name}: dummy bmc created")
+        kwargs = kwargs
+        super().__init__(name, **kwargs)
 
     def get_boot_device(self):
         return self.bootdevice

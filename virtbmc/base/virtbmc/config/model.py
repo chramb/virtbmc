@@ -23,16 +23,14 @@ from typing import Optional
 # - store preconfigured "drivers" in different dir or same file
 
 
-
 @dataclass
 class AppGeneralConfig:
     default_driver: Optional[str] = None
     show_passwords: bool = False
-    config_dir: Path = field(default_factory=Path)
     storage_type: str = "json"
 
     def __post_init__(self):
-        if not self.default_driver and (env_driver := os.environ.get("VIRTBMC_DRIVER")):
+        if not self.default_driver and (env_driver := os.getenv("VIRTBMC_DRIVER")):
             self.default_driver = env_driver
         if not self.default_driver:
             self.default_driver = "dummy"
@@ -65,3 +63,4 @@ class AppConfig:
     server: AppServerConfig = field(default_factory=AppServerConfig)
     log: AppLogConfig = field(default_factory=AppLogConfig)
     ipmi: AppIPMIConfig = field(default_factory=AppIPMIConfig)
+    location: Path = field(init=False)

@@ -5,15 +5,14 @@ build-backend = "setuptools.build_meta"
 
 [tool.flit.sdist]
 exclude = [".gitignore"]
-include = ["virtbmc_core"]
+include = ["virtbmc"]
 
 
 # Project
 [project]
-name = "virtbmc-core"
+name = "virtbmc"
 version = "0.0.0"               # TODO: move to hatch do these dynamically
 description = "hello"
-license = { file = "LICENSE" }
 authors = [{ name = "chramb" }]
 #dynamic = ["description", "version"]
 requires-python = ">=3.8"
@@ -24,7 +23,7 @@ dependencies = []
 Home = "https://github.com/chramb/vbmc"
 
 [project.scripts]
-virtbmcd = "virtbmc_core.cmd.virtbmcd:main"
+virtbmcd = "virtbmc.__main__:main"
 
 [project.entry-points."virtbmc.driver"]
 dummy = "virtbmc_core.driver.dummy"
