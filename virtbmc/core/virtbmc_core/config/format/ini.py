@@ -1,19 +1,24 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict
-import configparser
+from configparser import ConfigParser
 
 if TYPE_CHECKING:
     from pathlib import Path
 
 
 def write(config: Dict[str, Any], file: Path) -> None:
-    raise NotImplementedError
+    parser = ConfigParser(default_section="BMC")
+    for k,v in config.items():
+        parser[k] = v
+    
+    with file.open("w") as f:
+        parser.write(f)
 
 
 def read(file: Path) -> Dict[str, Any]:
 
-    config = configparser.ConfigParser()
-    config.read(file)
+    parser = ConfigParser(default_section="BMC")
+    parser.read(file)
 
-    return {s: dict(config.items(s)) for s in config.sections()}
+    return {s: dict(parser.items(s)) for s in parser.sections()}

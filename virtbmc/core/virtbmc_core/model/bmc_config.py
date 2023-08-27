@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, TypedDict  # Any  # , Dict, Union
 
+from virtbmc_core.config import read as r
+from virtbmc_core.config import write as w
 from virtbmc_core.config.get_config import CONFIG
-from virtbmc_core.config.serialize import read as r
-from virtbmc_core.config.serialize import write as w
 
 if TYPE_CHECKING:
     from pathlib import Path

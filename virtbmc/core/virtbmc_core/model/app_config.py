@@ -4,9 +4,9 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional, TypedDict
 
+from virtbmc_core.config import read as r
+from virtbmc_core.config import write as w
 from virtbmc_core.config.get_config_dir import get_config_dir
-from virtbmc_core.config.serialize import read as r
-from virtbmc_core.config.serialize import write as w
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -115,7 +115,12 @@ def init(
     log=app_log_config(),
     ipmi=app_ipmi_config(),
 ) -> AppConfig:
-    return {"virtbmc": virtbmc, "server": server, "log": log, "ipmi": ipmi}
+    return {
+        "virtbmc": app_general_config(**virtbmc),
+        "server": app_server_config(**server),
+        "log": app_log_config(**log),
+        "ipmi": app_ipmi_config(**ipmi),
+    }
 
 
 def read(file) -> AppConfig:

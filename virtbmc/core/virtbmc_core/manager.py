@@ -8,7 +8,7 @@ from virtbmc_core.config import CONFIG
 if TYPE_CHECKING:
     from pathlib import Path
     from types import ModuleType
-    from typing import Dict
+    from typing import Dict, Generator, List
 
     import virtbmc_core.model.bmc_config as bmc_config
     from virtbmc_core.driver.base import BaseBMC
@@ -51,7 +51,11 @@ def delete(bmc: BaseBMC) -> None:
     return
 
 
-def load() -> BaseBMC:
-    file: Path = next(CONFIG["virtbmc"]["config_dir"].iterdir())
-    config: BmcConfig = bmc_config.read()  # type: ignore
-    return get(config)
+def load() -> Generator[BaseBMC, None, None]:
+    for file in CONFIG["virtbmc"]["config_dir"].iterdir():
+        config: BmcConfig = bmc_config.read()  # type: ignore
+        yield get(config)
+
+
+def load_all() -> List[BaseBMC]:
+    return [bmc for bmc in load()]

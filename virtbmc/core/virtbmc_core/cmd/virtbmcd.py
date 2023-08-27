@@ -21,7 +21,7 @@ _: AppConfig = CONFIG  # configures everything before starting app
 log: Logger = logging.getLogger("virtbmc.core")
 
 
-def main(args: Optional[Sequence] = None) -> None:
+def main(args: Optional[Sequence] = None) -> int:
     # fmt: off
     parser = argparse.ArgumentParser("virtbmcd", description="A virtual BMC server for controlling virtual instances") # noqa: E501
     parser.add_argument("-V", "--version", action="version", version=importlib.metadata.version("virtbmc_core")) # noqa: E501
@@ -37,6 +37,8 @@ def main(args: Optional[Sequence] = None) -> None:
 
     except KeyboardInterrupt:
         log.debug("received keyboard interrupt, exiting")
+
+    return 0
 
 
 if __name__ == "__main__":

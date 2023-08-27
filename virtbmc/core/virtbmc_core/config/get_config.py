@@ -5,8 +5,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import virtbmc_core.model.app_config as app_config
+from virtbmc_core.config import read
 from virtbmc_core.config.get_config_dir import get_config_dir
-from virtbmc_core.config.serialize import read
 
 if TYPE_CHECKING:
     from pathlib import Path
