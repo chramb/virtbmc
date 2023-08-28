@@ -21,7 +21,8 @@ def get_config_location() -> Path:
         path = Path("/etc/virtbmc")
         path.mkdir(exist_ok=True)
         return path
-    except IOError:
+    except IOError as e:
+        print("not in /etc", e)
         pass
 
     try:
@@ -30,8 +31,10 @@ def get_config_location() -> Path:
         ).expanduser()
         path.mkdir(exist_ok=True, parents=True)
         return path
-    except:
-        raise Exception("no place to store stuff")
+    except IOError as e:
+        print("not in .local", e)
+        pass
+    raise Exception("no place to store stuff")
 
 
 # TODO(Errors): handle if config is malformed
@@ -39,6 +42,7 @@ def get_config_location() -> Path:
 # invalid type/value for key
 def get_config() -> AppConfig:
     config_path: Optional[Path] = get_config_location()
+    print("config_path is: ", config_path)
     if config_path is not None:
         # if there's dir under that path
         if (config_dir := Path(config_path)).is_dir():
