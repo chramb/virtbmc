@@ -25,11 +25,17 @@ log = logging.getLogger("virtbmc.driver.dummy")
 # connection_args: Dict[str, str] = {"app_name": "VirtBMC", "app_version": "0.4"}
 
 
+@dataclass
 class OpenStackBMC(BaseBMC):
-    cloud: str
     name: str
+    cloud: Optional[str] = "__undefined__"
     driver: str = field(default="openstack", init=False)
     server: Server = field(init=False, repr=False)
+
+    def __post_init__(self) -> None:
+        if self.cloud == "__undefined__":
+            self.cloud = None
+        return super().__post_init__()
 
     def start(self):
         with openstack.connect(self.cloud) as conn:
@@ -43,16 +49,16 @@ class OpenStackBMC(BaseBMC):
             raise Exception("server stopped existing in meantime")
 
     def _ensure_status(self, target_status: status, interval: float = 5) -> None:
-        # TODO: somehow handle both active and shutoff if changed 
+        # TODO: somehow handle both active and shutoff if changed
         while self.server.status != target_status and self._started:
             # refresh server instance
             with openstack.connect(self.cloud) as conn:
                 server: Union[Server, None] = conn.compute.get_server(self.server)
                 if server is None:
                     raise Exception("server stopped existing in meantime")
-                if target_status == 'SHUTOFF':
+                if target_status == "SHUTOFF":
                     conn.compute.stop_server(server)
-                if target_status == 'ACTIVE':
+                if target_status == "ACTIVE":
                     conn.compute.stop_server(server)
 
             time.sleep(interval)
