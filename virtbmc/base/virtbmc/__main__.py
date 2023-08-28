@@ -37,9 +37,9 @@ def main(args: Optional[Sequence] = None) -> None:
         logging.getLogger("virtbmc.core").setLevel(logging.DEBUG)
         log.debug("Enabled debugging from cli")
     try:
-        bmcs: list[BaseBMC] = [bmc for bmc in bmc_load_all()]
-        for bmc in bmcs:
-            if bmc.autostart:
+        bmcs: Dict[str, BaseBMC] = {bmc.name: bmc for bmc in bmc_load_all()}
+        for bmc in bmcs.values():
+            if bmc.autostart and not parsed.no_autostart:
                 bmc.start()
 
         for name in parsed.name:
