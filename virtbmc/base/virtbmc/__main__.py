@@ -44,7 +44,7 @@ def main(args: Optional[Sequence] = None) -> None:
 
         for name in parsed.name:
             try:
-                bmcs[name].start()
+                bmcs[name].start() if bmcs[name]._started == False else None
                 bmc = bmcs.pop(name)
             except KeyError:
                 log.info(f"Invalid BMC name: {name}, skipping")
