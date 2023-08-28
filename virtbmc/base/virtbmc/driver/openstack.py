@@ -90,37 +90,23 @@ class OpenStackBMC(BaseBMC):
     def power_off(self):
         # this should be power down without waiting for clean shutdown
         with openstack.connect(self.cloud) as conn:
-            self.server: Server = conn.compute.get_server(self.server)
-            if (
-                self.server.status != "SHUTOFF"
-                or self.server.task_state != "powering-off"
-                or self._target != "off"
-            ):
+            if self._target != "off":
                 self._target = "off"
-                print(self.server.task_state)
                 conn.compute.stop_server(self.server)
-            return
+        return
 
     def power_on(self):
         with openstack.connect(self.cloud) as conn:
             self.server: Server = conn.compute.get_server(self.server)
-            if (
-                self.server.vm_state != "active"
-                or self.server.task_state != "powering-on"
-                or self._target != "on"
-            ):
+            if self._target != "on":
                 self._target = "on"
-                print(self.server.task_state)
                 conn.compute.start_server(self.server)
-                print(self.server.task_state)
-                print("-------")
-            return
+        return
 
     def power_reset(self):
         with openstack.connect(self.cloud) as conn:
             conn.compute.reboot_server(self.server, reboot_type="SOFT")
 
     def power_shutdown(self):
-        # Should attempt a clean shutdown
-        with openstack.connect(self.cloud) as conn:
-            conn.compute.stop_server(self.server)
+        # Should attempt a clean shutdown but openstack doesn't know the difference I think
+        self.power_off()
