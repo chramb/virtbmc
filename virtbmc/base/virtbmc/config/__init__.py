@@ -13,14 +13,14 @@ if TYPE_CHECKING:
 
 
 def get_config_location() -> Path:
-    print(os.environ.get("VIRTBMC_CONFIG"))
+    # TODO: shorten this
     if p := os.environ.get("VIRTBMC_CONFIG"):
         path: Path = Path(p).expanduser()
         try:
             path.mkdir(exist_ok=True)
             return path
         except IOError as e:
-            print("not in Env: ", e)
+            pass  # TODO: add log messages
 
     try:
         # EAFP (Easier to Ask Forgiveness than Permission)
@@ -28,7 +28,6 @@ def get_config_location() -> Path:
         path.mkdir(exist_ok=True)
         return path
     except IOError as e:
-        print("not in /etc", e)
         pass
 
     try:
@@ -38,7 +37,6 @@ def get_config_location() -> Path:
         path.mkdir(exist_ok=True, parents=True)
         return path
     except IOError as e:
-        print("not in .local", e)
         pass
     raise Exception("no place to store stuff")
 
@@ -47,7 +45,7 @@ def get_config_location() -> Path:
 # invalid key in section(propagate from Class init)
 # invalid type/value for key
 def get_config() -> AppConfig:
-    config_path: Optional[Path] = get_config_location()
+    config_path: Path = get_config_location()
     print("config_path is: ", config_path)
     if config_path is not None:
         # if there's dir under that path

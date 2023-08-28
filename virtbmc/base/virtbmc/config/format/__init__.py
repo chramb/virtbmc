@@ -20,12 +20,12 @@ if TYPE_CHECKING:
 # - add support for storing all bmcs in single file (if [virtbmc]/storage has no {name})
 
 modules: Dict[str, str] = {
-    "json": "virtbmc.config.format.json",
-    "ini": "virtbmc.config.format.ini",
-    "conf": "virtbmc.config.format.ini",
-    "toml": "virtbmc.config.format.toml",
-    "yaml": "virtbmc.config.format.yml",
-    "yml": "virtbmc.config.format.yml",
+    ".json": "virtbmc.config.format.json",
+    ".ini": "virtbmc.config.format.ini",
+    ".conf": "virtbmc.config.format.ini",
+    ".toml": "virtbmc.config.format.toml",
+    ".yaml": "virtbmc.config.format.yml",
+    ".yml": "virtbmc.config.format.yml",
 }
 
 
@@ -33,7 +33,7 @@ def read(file: Path) -> Dict[str, Any]:
     # TODO: add overload depending on path that returns BmcConfig or AppConfig
     if file.suffix in modules:
         # I have no idea how to properly type it
-        return importlib.import_module(file.suffix).read(file)
+        return importlib.import_module(modules[file.suffix]).read(file)
     else:
         raise Exception("invalid filetype")
 
