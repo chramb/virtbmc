@@ -40,8 +40,9 @@ class OpenStackBMC(BaseBMC):
     def start(self):
         with openstack.connect(self.cloud) as conn:
             server: Union[Server, None] = conn.compute.find_server(self.name)
-        if server is None:
-            raise Exception(f"Server with name {self.name} not found")
+            if server is None:
+                raise Exception(f"Server with name {self.name} not found")
+            self.server = server
         super().start()
 
     def _check_server_missing(self, server: Optional[Server]):
