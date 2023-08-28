@@ -95,7 +95,7 @@ class OpenStackBMC(BaseBMC):
                 or self.server.task_state is None
             ):
                 print(self.server.task_state)
-                self.server.stop(conn)
+                conn.compute.stop_server(self.server)
             return
 
     def power_on(self):
@@ -107,7 +107,7 @@ class OpenStackBMC(BaseBMC):
                 or self.server.task_state is None
             ):
                 print(self.server.task_state)
-                self.server.start(conn)
+                conn.compute.stop_server(self.server)
             return
 
     def power_reset(self):
