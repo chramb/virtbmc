@@ -21,6 +21,19 @@ if TYPE_CHECKING:
         autostart: bool
 
 
+# power_states = {
+#     "off": 0,
+#     "on": 1,
+#     "reset": 3,
+#     "diag": 4,
+#     "softoff": 5,
+#     "shutdown": 5,
+#     # NOTE(jbjohnso): -1 is not a valid direct boot state,
+#     #                 but here for convenience of 'in' statement
+#     "boot": -1,
+# }
+
+
 def _fix_not_implemented(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
@@ -51,7 +64,7 @@ class BaseBMC(Bmc):
     autostart: bool = False
     bmcuuid: Optional[str] = field(default=None, repr=False)
     thread: threading.Thread = field(init=False, repr=False)
-    started: bool = field(default=False, init=False, repr=False)
+    _started: bool = field(default=False, init=False, repr=False)
     # *^1: explanation
     # this class doesn't have driver in __init__ method but requires it to be initialized,
     # therefore no way of creating it without inheriting from it
@@ -63,15 +76,15 @@ class BaseBMC(Bmc):
         self.thread = threading.Thread(target=self.listen, daemon=False)
 
     def listen(self) -> None:
-        self.started = True
-        while self.started:
+        self._started = True
+        while self._started:
             ipmisession.Session.wait_for_rsp(CONFIG.ipmi.session_timeout)
 
     def start(self) -> None:
         self.thread.start()
 
     def stop(self) -> None:
-        self.started = False
+        self._started = False
 
     def config(self) -> BmcConfig:
-        return {f.name: getattr(self, f.name) for f in fields(self) if f.repr} # type: ignore
+        return {f.name: getattr(self, f.name) for f in fields(self) if f.repr}  # type: ignore
