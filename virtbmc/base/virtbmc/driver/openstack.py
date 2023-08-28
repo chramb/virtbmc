@@ -43,6 +43,7 @@ class OpenStackBMC(BaseBMC):
             if server is None:
                 raise Exception(f"Server with name {self.name} not found")
             self.server = server
+        print("started")
         super().start()
 
     def _check_server_missing(self, server: Optional[Server]):
