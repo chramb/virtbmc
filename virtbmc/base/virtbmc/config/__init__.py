@@ -13,7 +13,8 @@ if TYPE_CHECKING:
 
 
 def get_config_location() -> Path:
-    if p := os.environ.get("VIRTBMC_CONFIG", None):
+    print(os.environ.get("VIRTBMC_CONFIG"))
+    if p := os.environ.get("VIRTBMC_CONFIG"):
         path: Path = Path(p).expanduser()
         try:
             path.mkdir(exist_ok=True)
