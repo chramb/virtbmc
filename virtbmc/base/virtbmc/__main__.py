@@ -27,7 +27,7 @@ log: Logger = logging.getLogger("virtbmc")
 def main(args: Optional[Sequence] = None) -> None:
     # fmt: off
     parser = argparse.ArgumentParser("virtbmcd", description="Virtual BMC server for controlling virtual instances") # noqa: E501
-    parser.add_argument("-V", "--version", action="version", version=importlib.metadata.version("virtbmc_core")) # noqa: E501
+    parser.add_argument("-V", "--version", action="version", version=importlib.metadata.version("virtbmc")) # noqa: E501
     parser.add_argument("-d","--debug", action="store_true", help="enable logging debug information to console")
     parser.add_argument("--no-autostart", action="store_true", help="don't start BMCs configured with 'autostart=true'")
     parser.add_argument("name", action="store", nargs="*", help="names of BMCs to start")

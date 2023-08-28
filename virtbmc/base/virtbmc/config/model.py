@@ -5,8 +5,6 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Optional
 
-# from virtbmc_core.config.get import get_config_dir
-
 # NOTE: to add extra config options need to either create extra class
 # and make it optional in main or add parameter and add default
 

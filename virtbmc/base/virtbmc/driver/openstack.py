@@ -42,14 +42,18 @@ class OpenStackBMC(BaseBMC):
         if server is None:
             raise Exception("server stopped existing in meantime")
 
-    def _wait_util_power_status(self, status: status, interval: float = 5) -> None:
-        while self.server.status != status and self._started:
+    def _ensure_status(self, target_status: status, interval: float = 5) -> None:
+        # TODO: somehow handle both active and shutoff if changed 
+        while self.server.status != target_status and self._started:
             # refresh server instance
             with openstack.connect(self.cloud) as conn:
                 server: Union[Server, None] = conn.compute.get_server(self.server)
-
-            if server is None:
-                raise Exception("server stopped existing in meantime")
+                if server is None:
+                    raise Exception("server stopped existing in meantime")
+                if target_status == 'SHUTOFF':
+                    conn.compute.stop_server(server)
+                if target_status == 'ACTIVE':
+                    conn.compute.stop_server(server)
 
             time.sleep(interval)
         return

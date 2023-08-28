@@ -20,12 +20,12 @@ if TYPE_CHECKING:
 # - add support for storing all bmcs in single file (if [virtbmc]/storage has no {name})
 
 modules: Dict[str, str] = {
-    "json": "virtbmc_core.config.format.json",
-    "ini": "virtbmc_core.config.format.ini",
-    "conf": "virtbmc_core.config.format.ini",
-    "toml": "virtbmc_core.config.format.toml",
-    "yaml": "virtbmc_core.config.format.yml",
-    "yml": "virtbmc_core.config.format.yml",
+    "json": "virtbmc.config.format.json",
+    "ini": "virtbmc.config.format.ini",
+    "conf": "virtbmc.config.format.ini",
+    "toml": "virtbmc.config.format.toml",
+    "yaml": "virtbmc.config.format.yml",
+    "yml": "virtbmc.config.format.yml",
 }
 
 
