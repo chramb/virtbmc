@@ -56,7 +56,10 @@ def get_config() -> AppConfig:
             return cfg
 
     "return default config"
-    return AppConfig()
+    cfg = AppConfig()
+    cfg.location = Path("~/.virtbmc/")
+    cfg.location.mkdir(parents=True, exist_ok=True)
+    return cfg
 
 
 CONFIG: AppConfig = get_config()
