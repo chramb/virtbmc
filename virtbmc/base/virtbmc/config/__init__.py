@@ -15,8 +15,11 @@ if TYPE_CHECKING:
 def get_config_location() -> Path:
     if p := os.environ.get("VIRTBMC_CONFIG", None):
         path: Path = Path(p).expanduser()
-        path.mkdir(exist_ok=True)
-        return path
+        try:
+            path.mkdir(exist_ok=True)
+            return path
+        except IOError as e:
+            print("not in Env: ", e)
 
     try:
         # EAFP (Easier to Ask Forgiveness than Permission)
