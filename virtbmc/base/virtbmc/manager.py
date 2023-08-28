@@ -38,7 +38,7 @@ def bmc_delete(bmc: BaseBMC) -> None:
 
 def bmc_load_all() -> Generator[BaseBMC, None, None]:
     for file in (CONFIG.location / "bmc").iterdir():
-        yield bmc_create(**read(file))
+        yield bmc_create(read(file))
 
 
 def bmc_get_saved_config(name: str):
