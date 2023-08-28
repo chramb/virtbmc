@@ -14,9 +14,10 @@ if TYPE_CHECKING:
     from virtbmc.driver.base import BaseBMC, BmcConfig
 
 # All convenience methods to manage BMCs
-available_drivers: Dict[str, Type[BaseBMC]] = {
-    ep.name: ep for ep in importlib.metadata.entry_points().get("virtbmc.driver")  # type: ignore
-}
+if eps := importlib.metadata.entry_points().get("virtbmc.driver"):
+    available_drivers: Dict[str, Type[BaseBMC]] = {ep.name: ep.load() for ep in eps}
+else:
+    raise Exception("Please install this module properly")
 
 
 def _bmc_file(name: str) -> Path:
