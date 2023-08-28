@@ -31,6 +31,7 @@ class OpenStackBMC(BaseBMC):
     cloud: Optional[str] = "__undefined__"
     driver: str = field(default="openstack", init=False)
     server: Server = field(init=False, repr=False)
+    _target: str = field(default="none", init=False, repr=False)
 
     def __post_init__(self) -> None:
         if self.cloud == "__undefined__":
@@ -93,8 +94,9 @@ class OpenStackBMC(BaseBMC):
             if (
                 self.server.status != "SHUTOFF"
                 or self.server.task_state != "powering-off"
-                or self.server.task_state is None
+                or self._target != "off"
             ):
+                self._target = "off"
                 print(self.server.task_state)
                 conn.compute.stop_server(self.server)
             return
@@ -105,8 +107,9 @@ class OpenStackBMC(BaseBMC):
             if (
                 self.server.vm_state != "active"
                 or self.server.task_state != "powering-on"
-                or self.server.task_state is None
+                or self._target != "on"
             ):
+                self._target = "on"
                 print(self.server.task_state)
                 conn.compute.start_server(self.server)
                 print(self.server.task_state)
