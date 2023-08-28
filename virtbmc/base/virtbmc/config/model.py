@@ -3,7 +3,9 @@ from __future__ import annotations
 import os
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
+if TYPE_CHECKING:
+    from typing import Dict, Any
 
 # NOTE: to add extra config options need to either create extra class
 # and make it optional in main or add parameter and add default
@@ -38,8 +40,8 @@ class AppGeneralConfig:
 class AppServerConfig:
     address: str = "127.0.0.1"
     port: int = 50891
-    timeout: int = 5_000  # miliseconds
-    wait: int = 3_000  # miliseconds
+    # timeout: int = 5_000  # miliseconds
+    # wait: int = 3_000  # miliseconds
 
 
 @dataclass
@@ -62,3 +64,12 @@ class AppConfig:
     log: AppLogConfig = field(default_factory=AppLogConfig)
     ipmi: AppIPMIConfig = field(default_factory=AppIPMIConfig)
     location: Path = field(init=False)
+
+    @classmethod
+    def from_dict(cls, dict: Dict[str, Dict[str,Any]]):
+        return AppConfig(
+            virtbmc=AppGeneralConfig(**dict.get("virtbmc", {})),
+            server=AppServerConfig(**dict.get("server", {})),
+            log=AppLogConfig(**dict.get("log", {})),
+            ipmi=AppIPMIConfig(**dict.get("ipmi", {})),
+        )

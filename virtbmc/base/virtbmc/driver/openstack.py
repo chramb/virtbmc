@@ -102,12 +102,14 @@ class OpenStackBMC(BaseBMC):
         with openstack.connect(self.cloud) as conn:
             self.server: Server = conn.compute.get_server(self.server)
             if (
-                self.server.status != "ACTIVE"
+                self.server.vm_state != "active"
                 or self.server.task_state != "powering-on"
                 or self.server.task_state is None
             ):
                 print(self.server.task_state)
                 conn.compute.start_server(self.server)
+                print(self.server.task_state)
+                print("-------")
             return
 
     def power_reset(self):

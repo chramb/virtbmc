@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 import os
+
+from dataclasses import asdict
 from virtbmc.log import log_configure
 from virtbmc.config.format import read, write
 from pathlib import Path
@@ -46,7 +48,6 @@ def get_config_location() -> Path:
 # invalid type/value for key
 def get_config() -> AppConfig:
     config_path: Path = get_config_location()
-    print("config_path is: ", config_path)
     if config_path is not None:
         # if there's dir under that path
         if (config_dir := Path(config_path)).is_dir():
@@ -54,12 +55,12 @@ def get_config() -> AppConfig:
                 if (
                     config_file := (config_dir / "config").with_suffix("." + ext)
                 ).exists():
-                    cfg = AppConfig(**read(config_file.absolute()))
+                    cfg = AppConfig.from_dict(read(config_file.absolute()))
                     cfg.location = config_path
                     return cfg
         # if there's file under that path
         else:
-            cfg = AppConfig(**read(config_path.absolute()))
+            cfg = AppConfig.from_dict(read(config_path.absolute()))
             cfg.location = config_path.parent
             return cfg
 
@@ -71,4 +72,5 @@ def get_config() -> AppConfig:
 
 
 CONFIG: AppConfig = get_config()
+(CONFIG.location / "bmc").mkdir(parents=True, exist_ok=True)
 log_configure(CONFIG)

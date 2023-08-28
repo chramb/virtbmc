@@ -4,7 +4,6 @@ import argparse
 import importlib.metadata
 import logging
 import sys
-from platform import architecture
 from typing import TYPE_CHECKING
 
 from virtbmc.config import CONFIG
@@ -34,7 +33,7 @@ def main(args: Optional[Sequence] = None) -> None:
     # fmt: on
     parsed: Namespace = parser.parse_args(args[1:] if args else None)
     if parsed.debug:
-        logging.getLogger("virtbmc.core").setLevel(logging.DEBUG)
+        logging.getLogger("virtbmc").setLevel(logging.DEBUG)
         log.debug("Enabled debugging from cli")
     try:
         bmcs: Dict[str, BaseBMC] = {bmc.name: bmc for bmc in bmc_load_all()}
