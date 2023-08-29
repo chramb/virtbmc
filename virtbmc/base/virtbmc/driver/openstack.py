@@ -109,14 +109,16 @@ class OpenStackBMC(BaseBMC):
         if self.server.status == "SHUTOFF" or self.server.task_state == "powering-off":
             return
 
-        if self.server.status == "ACTIVE":  # handle other states
+        # try:
+        if self.is_active():
             self.server.stop(self.conn.compute)
             self.server.task_state = "powering-off"
             self.server.vm_state = "stopped"
             return
-
+        # except openstack.exceptions.ConflictException:
+        #     pass
         self.server = self.conn.compute.get_server(self.server)
-        return IPMI_COMMAND_NODE_BUSY
+        return IPMI_COMMAND_NODE_BUSY  # Gets there when rebooting
 
     def power_on(self, task_state: str = "powering-on"):
         print("called power on")
@@ -130,9 +132,7 @@ class OpenStackBMC(BaseBMC):
             return
 
         self.server = self.conn.compute.get_server(self.server)
-
-        print("BUSYYYY")
-        return IPMI_COMMAND_NODE_BUSY
+        return IPMI_COMMAND_NODE_BUSY  # Gets there when rebooting
 
     def power_reset(self):
         print("reset called")
