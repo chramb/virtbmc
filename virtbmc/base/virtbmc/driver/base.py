@@ -53,7 +53,7 @@ def _handle_not_implemented_methods(cls):
 
 
 @dataclass
-#@_handle_not_implemented_methods
+# @_handle_not_implemented_methods
 class BaseBMC(Bmc):
     name: str
     driver: str = field(init=False)  # Fancy way to create "ABC" ^1
@@ -87,4 +87,4 @@ class BaseBMC(Bmc):
         self._started = False
 
     def config(self) -> BmcConfig:
-        return {f.name: getattr(self, f.name) for f in fields(self) if f.repr}  # type: ignore
+        return {f.name: getattr(self, f.name) for f in fields(self) if f.repr}  # type: ignore too lazy to do casting

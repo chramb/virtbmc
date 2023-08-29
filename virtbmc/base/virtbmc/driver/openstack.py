@@ -136,7 +136,7 @@ class OpenStackBMC(BaseBMC):
         if self.server.task_state in ["rebooting", "reboot_started"]:
             return
         try:
-            self.server.reboot(self.conn, reboot_type="SOFT")
+            self.server.reboot(self.conn.compute, reboot_type="SOFT")
             self.server.task_state = "rebooting"
             return
         except Exception as e:
@@ -146,8 +146,8 @@ class OpenStackBMC(BaseBMC):
     def power_cycle(self):
         if self.server.task_state in ["rebooting_hard", "reboot_started_hard"]:
             return
-        try: #if self.server.task_state in ["ACTIVE", "SHUTOFF"]:
-            self.server.reboot(self.conn, reboot_type="SOFT")
+        try:  # if self.server.task_state in ["ACTIVE", "SHUTOFF"]:
+            self.server.reboot(self.conn.compute, reboot_type="SOFT")
             self.server.task_state = "rebooting_hard"
             return
         except Exception as e:
