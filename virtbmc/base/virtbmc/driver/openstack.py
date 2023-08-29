@@ -143,11 +143,10 @@ class OpenStackBMC(BaseBMC):
         if self.is_active():  # if self.server.task_state in ["ACTIVE", "SHUTOFF"]:
             self.server.reboot(self.conn.compute, reboot_type="SOFT")
             self.server.task_state = "rebooting"
+            return
         else:
             self.power_on(task_state="rebooting")
             return
-        print("BUSYYYY")
-        return IPMI_COMMAND_NODE_BUSY
 
     def power_cycle(self):
         print("cycle called")
@@ -157,11 +156,10 @@ class OpenStackBMC(BaseBMC):
         if self.is_active():  # if self.server.task_state in ["ACTIVE", "SHUTOFF"]:
             self.server.reboot(self.conn.compute, reboot_type="HARD")
             self.server.task_state = "rebooting_hard"
+            return
         else:
             self.power_on(task_state="rebooting_hard")
             return
-        print("BUSYYYY")
-        return IPMI_COMMAND_NODE_BUSY
 
     def power_shutdown(self):
         print("called shutdown")
