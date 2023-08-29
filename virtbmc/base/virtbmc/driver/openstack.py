@@ -155,7 +155,7 @@ class OpenStackBMC(BaseBMC):
             return
         # if self.server.vm_state == "stopped":
         if self.is_active():  # if self.server.task_state in ["ACTIVE", "SHUTOFF"]:
-            self.server.reboot(self.conn.compute, reboot_type="")
+            self.server.reboot(self.conn.compute, reboot_type="HARD")
             self.server.task_state = "rebooting_hard"
         else:
             self.power_on(task_state="rebooting_hard")
