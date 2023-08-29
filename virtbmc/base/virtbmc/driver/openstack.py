@@ -90,12 +90,15 @@ class OpenStackBMC(BaseBMC):
         self.stop()
         return 0
 
-    def is_active(self):
-        print("is active called")
+    def _get_server(self) -> Server:
         self.server = self.conn.compute.get_server(self.server)
         if self.server is None:
             raise Exception("server stopped existing in meantime")
-        return self.server.status == "ACTIVE"
+        return self.server
+
+    def is_active(self):
+        print("is active called")
+        return self._get_server().status == "ACTIVE"
 
     def get_power_state(self):
         print("Get power state called")
@@ -105,51 +108,36 @@ class OpenStackBMC(BaseBMC):
 
     def power_off(self):
         print("called power-off")
-        # this should be power down without waiting for clean shutdown
-        if self.server.status == "SHUTOFF" or self.server.task_state == "powering-off":
-            return
-
-        # try:
-        if self.is_active():
+        if self._get_server().status == "ACTIVE":
             self.server.stop(self.conn.compute)
             self.server.task_state = "powering-off"
-            self.server.vm_state = "stopped"
             return
-        # except openstack.exceptions.ConflictException:
-        #     pass
-        self.server = self.conn.compute.get_server(self.server)
+
         return IPMI_COMMAND_NODE_BUSY  # Gets there when rebooting
 
     def power_on(self, task_state: str = "powering-on"):
         print("called power on")
-        if self.server.status == "ACTIVE" or self.server.task_state == "powering-on":
-            return
-
-        if self.server.status in ["SHUTOFF", "STOPPED"]:
+        if self._get_server().status in ["SHUTOFF", "STOPPED"]:
             self.server.start(self.conn.compute)
-            self.server.task_state = task_state
-            self.server.vm_state = "active"
             return
 
-        self.server = self.conn.compute.get_server(self.server)
         return IPMI_COMMAND_NODE_BUSY  # Gets there when rebooting
 
     def power_reset(self):
-        print("reset called")
+        self.server = self._get_server()
         if self.server.task_state in ["rebooting", "reboot_started"]:
             return
         if self.server.vm_state == "stopped":
             self.power_on(task_state="rebooting")
-        if self.is_active():  # if self.server.task_state in ["ACTIVE", "SHUTOFF"]:
+        if self.server.status == "ACTIVE":  # if self.server.task_state in ["ACTIVE", "SHUTOFF"]:
             self.server.reboot(self.conn.compute, reboot_type="SOFT")
-            self.server.task_state = "rebooting"
             return
         else:
             self.power_on(task_state="rebooting")
             return
 
     def power_cycle(self):
-        print("cycle called")
+        self.server = self._get_server()
         if self.server.task_state in ["rebooting_hard", "reboot_started_hard"]:
             return
         # if self.server.vm_state == "stopped":
