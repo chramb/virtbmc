@@ -67,18 +67,16 @@ class OpenStackBMC(BaseBMC):
     driver: str = field(default="openstack", init=False)
     server: Server = field(init=False, repr=False)
     conn: Connection = field(init=False, repr=False)
-    _target: str = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
-        conn = openstack.connect(cloud=self.cloud)
         return super().__post_init__()
 
     def start(self):
-        with openstack.connect(self.cloud) as conn:
-            server: Union[Server, None] = conn.compute.find_server(self.name)
-            if server is None:
-                raise Exception(f"Server with name {self.name} not found")
-            self.server = server
+        self.conn = openstack.connect(cloud=self.cloud)
+        server: Union[Server, None] = self.conn.compute.find_server(self.name)
+        if server is None:
+            raise Exception(f"Server with name {self.name} not found")
+        self.server = server
         print("started")
         super().start()
 
