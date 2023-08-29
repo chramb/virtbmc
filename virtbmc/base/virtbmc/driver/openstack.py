@@ -133,8 +133,26 @@ class OpenStackBMC(BaseBMC):
         return IPMI_COMMAND_NODE_BUSY
 
     def power_reset(self):
-        with openstack.connect(self.cloud) as conn:
-            conn.compute.reboot_server(self.server, reboot_type="SOFT")
+        if self.server.task_state in ["rebooting", "reboot_started"]:
+            return
+        try:
+            self.server.reboot(self.conn, reboot_type="SOFT")
+            self.server.task_state = "rebooting"
+            return
+        except Exception as e:
+            print(e)
+            return IPMI_COMMAND_NODE_BUSY
+
+    def power_cycle(self):
+        if self.server.task_state in ["rebooting_hard", "reboot_started_hard"]:
+            return
+        try: #if self.server.task_state in ["ACTIVE", "SHUTOFF"]:
+            self.server.reboot(self.conn, reboot_type="SOFT")
+            self.server.task_state = "rebooting_hard"
+            return
+        except Exception as e:
+            print(e)
+            return IPMI_COMMAND_NODE_BUSY
 
     def power_shutdown(self):
         print("called shutdown")

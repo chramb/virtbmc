@@ -53,7 +53,7 @@ def _handle_not_implemented_methods(cls):
 
 
 @dataclass
-@_handle_not_implemented_methods
+#@_handle_not_implemented_methods
 class BaseBMC(Bmc):
     name: str
     driver: str = field(init=False)  # Fancy way to create "ABC" ^1
