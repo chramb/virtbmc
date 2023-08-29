@@ -117,6 +117,7 @@ class OpenStackBMC(BaseBMC):
 
         self.server = self.conn.compute.get_server(self.server)
 
+        print("BUSYYYY")
         return IPMI_COMMAND_NODE_BUSY
 
     def power_on(self, task_state: str = "powering-on"):
@@ -132,6 +133,7 @@ class OpenStackBMC(BaseBMC):
 
         self.server = self.conn.compute.get_server(self.server)
 
+        print("BUSYYYY")
         return IPMI_COMMAND_NODE_BUSY
 
     def power_reset(self):
@@ -139,27 +141,27 @@ class OpenStackBMC(BaseBMC):
             return
         if self.server.vm_state == "stopped":
             self.power_on(task_state="rebooting")
-        try:
+        if self.is_active():  # if self.server.task_state in ["ACTIVE", "SHUTOFF"]:
             self.server.reboot(self.conn.compute, reboot_type="SOFT")
             self.server.task_state = "rebooting"
+        else:
+            self.power_on(task_state="rebooting")
             return
-        except Exception as e:
-            print(e)
-            return IPMI_COMMAND_NODE_BUSY
+        print("BUSYYYY")
+        return IPMI_COMMAND_NODE_BUSY
 
     def power_cycle(self):
         if self.server.task_state in ["rebooting_hard", "reboot_started_hard"]:
             return
-        if self.server.vm_state == "stopped":
+        # if self.server.vm_state == "stopped":
+        if self.is_active():  # if self.server.task_state in ["ACTIVE", "SHUTOFF"]:
+            self.server.reboot(self.conn.compute, reboot_type="HARD")
+            self.server.task_state = "rebooting_hard"
+        else:
             self.power_on(task_state="rebooting_hard")
             return
-        try:  # if self.server.task_state in ["ACTIVE", "SHUTOFF"]:
-            self.server.reboot(self.conn.compute, reboot_type="SOFT")
-            self.server.task_state = "rebooting_hard"
-            return
-        except Exception as e:
-            print(e)
-            return IPMI_COMMAND_NODE_BUSY
+        print("BUSYYYY")
+        return IPMI_COMMAND_NODE_BUSY
 
     def power_shutdown(self):
         print("called shutdown")
