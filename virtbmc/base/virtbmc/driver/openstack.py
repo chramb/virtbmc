@@ -128,6 +128,7 @@ class OpenStackBMC(BaseBMC):
         return IPMI_COMMAND_NODE_BUSY  # Gets there when rebooting
 
     def power_reset(self):
+        print("called cycle")
         _ = self._get_server()
         if self.server.task_state in ["rebooting", "reboot_started", "powering-on"]:
             return
@@ -140,6 +141,7 @@ class OpenStackBMC(BaseBMC):
         return IPMI_COMMAND_NODE_BUSY  # Gets there when rebooting
 
     def power_cycle(self):
+        print("called cycle")
         _ = self._get_server()
         if self.server.task_state in [
             "rebooting_hard",
