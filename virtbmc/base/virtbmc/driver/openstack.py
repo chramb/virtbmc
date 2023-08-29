@@ -91,13 +91,14 @@ class OpenStackBMC(BaseBMC):
         return 0
 
     def is_active(self):
-        with openstack.connect(session=self.conn) as conn:
-            self.server = conn.compute.get_server(self.server)
-            if self.server is None:
-                raise Exception("server stopped existing in meantime")
-            return self.server.status == "ACTIVE"
+        print("is active called")
+        self.server = self.conn.compute.get_server(self.server)
+        if self.server is None:
+            raise Exception("server stopped existing in meantime")
+        return self.server.status == "ACTIVE"
 
     def get_power_state(self):
+        print("Get power state called")
         #     "off": 0,
         #     "on": 1,
         return "on" if self.is_active() else "off"
@@ -123,7 +124,7 @@ class OpenStackBMC(BaseBMC):
             return
 
         if self.server.status in ["SHUTOFF", "STOPPED"]:
-            self.server.stop(self.conn.compute)
+            self.server.start(self.conn.compute)
             self.server.task_state = "powering-on"
             return
 
