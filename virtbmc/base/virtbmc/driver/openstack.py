@@ -113,7 +113,7 @@ class OpenStackBMC(BaseBMC):
         self._refresh_server_state()
         if self.server.status == "SHUTOFF":
             return
-        if self.server.task_state == "powering-off":
+        if self.server.task_state:  # == "powering-off":
             return IPMI_COMMAND_NODE_BUSY
         if self.server.status == "ACTIVE":
             self.server.stop(self.conn.compute)
@@ -126,7 +126,7 @@ class OpenStackBMC(BaseBMC):
         self._refresh_server_state()
         if self.server.status == "ACTIVE":
             return
-        if self.server.task_state == "powering-on":
+        if self.server.task_state:  # == "powering-on":
             return IPMI_COMMAND_NODE_BUSY
         if self.server.status in ["SHUTOFF", "STOPPED"]:
             self.server.start(self.conn.compute)
@@ -137,7 +137,9 @@ class OpenStackBMC(BaseBMC):
     def power_reset(self):
         log.debug("power_reset(): called")
         self._refresh_server_state()
-        if self.server.task_state in ["rebooting", "reboot_started", "powering-on"]:
+        if (
+            self.server.task_state
+        ):  #  in ["rebooting", "reboot_started", "powering-on"]:
             return IPMI_COMMAND_NODE_BUSY
         if self.server.vm_state == "stopped":
             self.power_on()
@@ -150,11 +152,9 @@ class OpenStackBMC(BaseBMC):
     def power_cycle(self):
         log.debug("power_cycle(): called")
         self._refresh_server_state()
-        if self.server.task_state in [
-            "rebooting_hard",
-            "reboot_started_hard",
-            "powering-on",
-        ]:
+        if (
+            self.server.task_state
+        ):  #  in [ "rebooting_hard", "reboot_started_hard", "powering-on",]:
             return IPMI_COMMAND_NODE_BUSY
         if self.server.vm_state == "stopped":
             self.power_on()
