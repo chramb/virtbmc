@@ -37,21 +37,6 @@ def main(args: Optional[Sequence] = None) -> None:
         logging.getLogger("virtbmc").setLevel(logging.DEBUG)
         log.debug("Enabled debugging from cli")
 
-    if parsed.drivers:
-        import importlib.util as util
-
-        from virtbmc.driver import check_optional_deps
-
-        print("Available Drivers:")
-        # There's 100% better way to do it
-        for driver, dependencies in check_optional_deps.items():
-            has_all = True
-            for dep in dependencies:
-                if util.find_spec(dep) is None:
-                    has_all = False
-            if has_all:
-                print(f" - {driver}")
-
     bmcs: List[BaseBMC] = []
     try:
         for file in (CONFIG.location / "bmc").iterdir():

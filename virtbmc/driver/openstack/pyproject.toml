@@ -1,0 +1,31 @@
+# Build
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.flit.sdist]
+exclude = [".gitignore"]
+include = ["virtbmc_driver_openstack"]
+
+
+# Project
+[project]
+name = "virtbmc_driver_openstack"
+version = "0.0.0"                 # TODO: move to hatch do these dynamically
+description = "hello"
+authors = [{ name = "chramb" }]
+#dynamic = ["description", "version"]
+requires-python = ">=3.8"
+classifiers = ["License :: OSI Approved :: Apache Software License"]
+dependencies = [""]
+# TODO: add virtbmc_driver_core core
+
+[project.urls]
+Home = "https://github.com/chramb/vbmc"
+
+[project.scripts]
+virtbmcd = "virtbmc.__main__:main"
+
+[project.entry-points."virtbmc.driver"]
+dummy = "virtbmc.driver.dummy:DummyBMC"
+openstack = "virtbmc.driver.openstack:OpenStackBMC"

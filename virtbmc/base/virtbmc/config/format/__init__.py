@@ -21,8 +21,8 @@ if TYPE_CHECKING:
 
 modules: Dict[str, str] = {
     ".json": "virtbmc.config.format.json",
-    ".ini": "virtbmc.config.format.ini",
-    ".conf": "virtbmc.config.format.ini",
+    # ".ini": "virtbmc.config.format.ini",
+    # ".conf": "virtbmc.config.format.ini",
     ".toml": "virtbmc.config.format.toml",
     ".yaml": "virtbmc.config.format.yml",
     ".yml": "virtbmc.config.format.yml",
