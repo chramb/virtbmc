@@ -5,7 +5,23 @@ from typing import TYPE_CHECKING, Any, Dict
 try:
     import yaml
 except ImportError:
-    raise ImportError("Missing PyYaml")
+    import logging
+    import sys
+    import textwrap
+
+    log = logging.getLogger(__name__)
+
+    msg = """
+        Missing required dependency `PyYaml`.
+        Please install it using pip or other preferred method.
+
+        Command to install it using pip:
+
+            $ pip install PyYaml
+
+        """  # Switch/add virtbmc documentation if it ever gets created
+    log.critical(textwrap.dedent(msg))
+    sys.exit(-1)
 
 if TYPE_CHECKING:
     from pathlib import Path

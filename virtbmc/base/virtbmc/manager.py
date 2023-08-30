@@ -15,9 +15,9 @@ if TYPE_CHECKING:
 
 # All convenience methods to manage BMCs
 if eps := importlib.metadata.entry_points().get("virtbmc.driver"):
-    available_drivers: Dict[str, Type[BaseBMC]] = {ep.name: ep.load() for ep in eps}
+    available_drivers: Dict[str, importlib.metadata.EntryPoint] = {ep.name: ep for ep in eps}
 else:
-    raise Exception("Please install this module properly")
+    raise Exception("Please install this package properly") # Only happens if driver.dummy not present
 
 
 def _bmc_file(name: str) -> Path:
@@ -28,7 +28,7 @@ def _bmc_file(name: str) -> Path:
 
 # config: Type[BmcConfig]
 def bmc_create(config: Dict[str, Any]) -> BaseBMC:
-    return available_drivers[config.pop("driver")](**config)
+    return available_drivers[config.pop("driver")].load()(**config)
 
 
 def bmc_delete(bmc: BaseBMC) -> None:

@@ -23,4 +23,8 @@ def read(file: Path) -> Dict[str, Any]:
     config = configparser.ConfigParser()
     config.read(file)
 
-    return {s: dict(config.items(s)) for s in config.sections()}
+    cfg = {s: dict(config.items(s)) for s in config.sections()}
+    if virtbmc := cfg.get("virtbmc"):
+        return virtbmc
+    else:
+        return cfg

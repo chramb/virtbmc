@@ -61,7 +61,6 @@ class BaseBMC(Bmc):
     password: str = "password"
     port: int = 6230
     address: str = "::1"
-    autostart: bool = False
     bmcuuid: Optional[str] = field(default=None, repr=False)
     thread: threading.Thread = field(init=False, repr=False)
     _started: bool = field(default=False, init=False, repr=False)
