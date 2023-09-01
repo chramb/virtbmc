@@ -26,7 +26,7 @@ class Bmc(_bmc.Bmc):  # type: ignore[misc]
     password: str = "password"
     port: int = 623
     address: str = "::"
-    _started: bool = field(default=False, init=False, repr=False)
+    _stopped: bool = field(default=False, init=False, repr=False)
 
     def __post_init__(self) -> None:
         super().__init__(
@@ -36,12 +36,11 @@ class Bmc(_bmc.Bmc):  # type: ignore[misc]
         )
 
     def listen(self, timeout: int = 30) -> None:  # type: ignore[override]
-        self._started = True
-        while self._started:
+        while not self._stopped:
             _ipmisession.Session.wait_for_rsp(timeout)
 
     def stop(self) -> None:
-        self._started = False
+        self._stopped = True
 
     def config(self) -> BmcConfig:
         # fmt: off
