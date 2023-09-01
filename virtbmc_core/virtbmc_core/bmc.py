@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field, fields
 from typing import TYPE_CHECKING
 
 import pyghmi.ipmi.bmc as _bmc
@@ -10,23 +9,31 @@ if TYPE_CHECKING:
     from typing import TypedDict
 
     class BmcConfig(TypedDict):
-        name: str
         driver: str
+        name: str
         username: str
         password: str
         port: int
         address: str
 
 
-@dataclass
-class Bmc(_bmc.Bmc):  # type: ignore[misc]
-    name: str
-    driver: str = field(init=False, default="None")
-    username: str = "admin"
-    password: str = "password"
-    port: int = 623
-    address: str = "::"
-    _stopped: bool = field(default=False, init=False, repr=False)
+class Bmc(_bmc.Bmc):
+    driver: str
+    _stopped: bool = False
+
+    def __init__(
+        self,
+        name: str,
+        username: str = "admin",
+        password: str = "password",
+        port: int = 623,
+        address: str = "::",
+    ) -> None:
+        self.name = name
+        self.username = username
+        self.password = password
+        self.port = port
+        self.address = address
 
     def start(self, timeout: int = 30) -> None:
         super().__init__(
@@ -42,6 +49,6 @@ class Bmc(_bmc.Bmc):  # type: ignore[misc]
         self._stopped = True
 
     def config(self) -> BmcConfig:
-        # fmt: off
-        return {f.name: getattr(self, f.name) for f in fields(self) if f.repr} # type: ignore[return-value]
-        # fmt: on
+        # This is incorrect return statement for children classes
+        # but more helpful than the proper one
+        return {"driver": self.driver, **vars(self)}  # type: ignore[misc]
