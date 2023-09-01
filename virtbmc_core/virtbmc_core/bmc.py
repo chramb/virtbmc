@@ -28,14 +28,13 @@ class Bmc(_bmc.Bmc):  # type: ignore[misc]
     address: str = "::"
     _stopped: bool = field(default=False, init=False, repr=False)
 
-    def __post_init__(self) -> None:
+    def listen(self, timeout: int = 30) -> None:  # type: ignore[override]
         super().__init__(
             authdata={self.username: self.password},
             address=self.address,
             port=self.port,
         )
 
-    def listen(self, timeout: int = 30) -> None:  # type: ignore[override]
         while not self._stopped:
             _ipmisession.Session.wait_for_rsp(timeout)
 
