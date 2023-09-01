@@ -28,7 +28,7 @@ class Bmc(_bmc.Bmc):  # type: ignore[misc]
     address: str = "::"
     _stopped: bool = field(default=False, init=False, repr=False)
 
-    def listen(self, timeout: int = 30) -> None:  # type: ignore[override]
+    def start(self, timeout: int = 30) -> None:
         super().__init__(
             authdata={self.username: self.password},
             address=self.address,
