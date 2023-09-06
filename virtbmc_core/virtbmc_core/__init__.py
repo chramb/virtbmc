@@ -1,1 +1,1 @@
-from .bmc import Bmc
+from .bmc import Bmc  # noqa: F401
