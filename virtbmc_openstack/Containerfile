@@ -1,0 +1,37 @@
+FROM docker.io/library/alpine:3.18 as build
+
+# Install required build dependencies
+RUN :\
+    && install -d -o 1000 -g 1000 /virtbmc \
+    && adduser -D -h /virtbmc -s /bin/sh -H -h /virtbmc -u 1000 virtbmc-builder \
+    && apk --update add --no-cache \
+    python3 python3-dev py3-pip \
+    gcc git libffi-dev libc-dev linux-headers
+
+USER virtbmc-builder
+
+COPY --chown=1000:1000 . /build
+
+# Install locally
+RUN pip install \
+    --user \
+    --no-warn-script-location \
+    /build/virtbmc_core \
+    /build/virtbmc_openstack
+
+FROM docker.io/library/alpine:3.18 as run
+
+# Install python
+RUN :\
+    && install -d -o 1000 -g 1000 /virtbmc \
+    && adduser -D -h /virtbmc -s /bin/sh -H -h /virtbmc -u 1000 virtbmc \
+    && apk --update add --no-cache python3
+
+# Copy installed packages
+COPY --from=build /virtbmc /virtbmc
+
+USER virtbmc
+
+EXPOSE 623/udp
+
+ENTRYPOINT [ "python", "-m", "virtbmc_openstack" ]
