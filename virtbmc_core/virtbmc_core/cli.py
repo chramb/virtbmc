@@ -1,7 +1,13 @@
-import argparse
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from argparse import ArgumentParser, _ArgumentGroup
+    from typing import Tuple
 
 
-def bmc_options(parser: argparse.ArgumentParser):
+def bmc_options(parser: ArgumentParser) -> Tuple[ArgumentParser, _ArgumentGroup]:
     # fmt: off
     group = parser.add_argument_group("VirtBMC Options")
     group.add_argument("-u","--username", default="admin", type=str, action="store", help="The BMC username (default: admin)")  # noqa: E501

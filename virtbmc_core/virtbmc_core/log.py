@@ -40,7 +40,7 @@ def log_format(
         }
 
         class ColorFormatter(logging.Formatter):
-            def format(self, record) -> str:
+            def format(self, record: logging.LogRecord) -> str:
                 _format: str = LEVEL_FORMAT[record.levelno]
                 _formatter = logging.Formatter(
                     fmt=_format, style="{", datefmt=date_format
