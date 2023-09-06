@@ -83,7 +83,7 @@ class OpenStackBMC(Bmc):
         else:
             self.server = server
             log.info(f"{self.name} started with connection to cloud: {self.cloud}")
-            super().listen()
+            super().start()
 
     def stop(self) -> None:
         self._running = False

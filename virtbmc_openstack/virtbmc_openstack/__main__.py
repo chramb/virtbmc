@@ -46,7 +46,7 @@ def main(args: Optional[Sequence[str]] = None) -> int:
             password=parsed.password,
             cloud=parsed.os_cloud,
         )
-        bmc.listen()
+        bmc.start()
 
     except KeyboardInterrupt:
         if bmc:
