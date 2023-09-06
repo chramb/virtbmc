@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import os
+import sys
 
 # BRIGHT_BLACK = "\33[30;1m"
 # BRIGHT_RED = "\33[31;1m"
@@ -30,7 +31,7 @@ def log_format(
     message_format: str = "{asctime} {levelname}: {message}",
     date_format: str = "%Y-%m-%d %H:%M:%S",
 ) -> None:
-    if os.isatty(2) and not os.environ.get("NO_COLOR", False):
+    if sys.stderr.isatty() and not os.environ.get("NO_COLOR", False):
         LEVEL_FORMAT: dict[int, str] = {
             logging.DEBUG: f"{BLUE}{message_format}{RESET}",
             logging.INFO: f"{message_format}",
