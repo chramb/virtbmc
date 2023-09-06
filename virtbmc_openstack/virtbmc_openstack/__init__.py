@@ -77,8 +77,7 @@ class OpenStackBMC(Bmc):
         server: Optional[Server] = self.conn.compute.find_server(self.name)
         if server is None:
             log.error(
-                f"server: {self.name} not found \
-                      in the {self.cloud} cloud, stopping bmc"
+                f"server: {self.name} not found in the {self.cloud} cloud, stopping bmc"
             )
             self.stop()
         else:
@@ -88,7 +87,7 @@ class OpenStackBMC(Bmc):
 
     def stop(self) -> None:
         self._running = False
-        log.info(f"{self.name} stopped, closing the connection to the cloud")
+        log.info(f"{self.name} stopped, closing connection to the cloud: {self.cloud}")
         self.conn.close()
 
     # BMC Operations
@@ -101,9 +100,9 @@ class OpenStackBMC(Bmc):
     def _refresh_server_state(self) -> None:
         server = self.conn.compute.get_server(self.server)
         log.debug(
-            f"Refreshing server status: current server status: BMC: {self!r}; \
-                status: {self.server.status}; vm_state: {self.server.vm_state}; \
-                task_state: {self.server.task_state};"
+            f"Refreshing server status: current server status: "
+            f"{self.server.status}; vm_state: {self.server.vm_state}; "
+            f"task_state: {self.server.task_state};"
         )
         if self.server is None:
             log.error("server stopped existing in meantime, exiting")
