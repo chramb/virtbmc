@@ -23,13 +23,11 @@ class Bmc(_bmc.Bmc):
 
     def __init__(
         self,
-        name: str,
         username: str = "admin",
         password: str = "password",
         port: int = 623,
         address: str = "::",
     ) -> None:
-        self.name = name
         self.username = username
         self.password = password
         self.port = port
