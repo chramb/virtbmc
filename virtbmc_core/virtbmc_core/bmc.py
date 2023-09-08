@@ -6,14 +6,7 @@ import pyghmi.ipmi.bmc as _bmc
 import pyghmi.ipmi.private.session as _ipmisession
 
 if TYPE_CHECKING:
-    from typing import TypedDict
-
-    class BmcConfig(TypedDict):
-        driver: str
-        username: str
-        password: str
-        port: int
-        address: str
+    from typing import Dict, Union
 
 
 class Bmc(_bmc.Bmc):
@@ -45,7 +38,5 @@ class Bmc(_bmc.Bmc):
     def stop(self) -> None:
         self._stopped = True
 
-    def config(self) -> BmcConfig:
-        # This is incorrect return statement for children classes
-        # but more helpful than the proper one
-        return {"driver": self.driver, **vars(self)}  # type: ignore[misc]
+    def config(self) -> Dict[str, Union[str, int, None]]:
+        return {"driver": getattr(self, "driver", None), **vars(self)}
