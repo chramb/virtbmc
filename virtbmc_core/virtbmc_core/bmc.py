@@ -10,7 +10,6 @@ if TYPE_CHECKING:
 
     class BmcConfig(TypedDict):
         driver: str
-        name: str
         username: str
         password: str
         port: int
