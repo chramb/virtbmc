@@ -57,3 +57,4 @@ def log_format(
     handler = logging.StreamHandler()
     handler.setFormatter(formatter)
     logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
