@@ -26,6 +26,7 @@ def main(args: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("-d","--debug", action="store_true", help="enable logging debug information to console")  # noqa: E501
 
     parser, group = bmc_options(parser)
+    group.add_argument("--mode", action="store", default="safe", choices=("safe", "unsafe", "cached", "simple"), help="Chose api communication strategy")  # noqa: E501
     group.add_argument("server", action="store", help="Name or uuid of managed server")  # noqa: E501
 
     _ = openstack.connect(options=parser)  # type: ignore
@@ -40,6 +41,7 @@ def main(args: Optional[Sequence[str]] = None) -> int:
     try:
         bmc = OpenStackBMC(
             name=parsed.server,
+            mode=parsed.mode,
             address=parsed.address,
             port=parsed.port,
             username=parsed.username,
