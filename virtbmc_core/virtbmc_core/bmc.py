@@ -33,10 +33,13 @@ class Bmc(_bmc.Bmc):
         )
 
         while not self._stopped:
-            _ipmisession.Session.wait_for_rsp(timeout)
+            _ipmisession.Session.wait_for_rsp(timeout)  # pragma: no cover
 
     def stop(self) -> None:
         self._stopped = True
 
     def config(self) -> Dict[str, Union[str, int, None]]:
-        return {"driver": getattr(self, "driver", None), **vars(self)}
+        return {
+            "driver": getattr(self, "driver", None),
+            **{k: v for k, v in vars(self).items() if not k.startswith("_")},
+        }
