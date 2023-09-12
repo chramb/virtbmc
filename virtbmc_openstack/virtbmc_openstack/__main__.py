@@ -28,11 +28,11 @@ def main(args: Optional[Sequence[str]] = None) -> int:
     parser, group = bmc_options(parser)
     group.add_argument("--mode", action="store", default="safe", choices=("safe", "unsafe", "cached", "simple"), help="Chose api communication strategy")  # noqa: E501
     group.add_argument("server", action="store", help="Name or uuid of managed server")  # noqa: E501
+    # fmt: on
 
     _ = openstack.connect(options=parser)  # type: ignore
-    parsed: Namespace = parser.parse_args(args)
+    parsed: Namespace = parser.parse_args(args=args)
     log_format(log)
-    # fmt: on
 
     if parsed.debug:
         log.setLevel(logging.DEBUG)
