@@ -48,7 +48,6 @@ class BaseOpenStackBMC(Bmc):
 
     def start(self, timeout: int = 30) -> None:
         # TODO: add timeout when connecting for too long
-        log.debug("connecting to the cloud")
 
         self.conn = openstack.connect(cloud=self.cloud)
         server: Optional[Server] = self.conn.compute.find_server(self.name)
@@ -66,8 +65,8 @@ class BaseOpenStackBMC(Bmc):
 
             self.server = server
 
-            super().start(timeout=timeout)
             log.info(f"{self.name} started with connection to cloud")
+            super().start(timeout=timeout)
 
     def stop(self) -> None:
         self.conn.close()
