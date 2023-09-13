@@ -25,8 +25,11 @@ classifiers = [
 dependencies = ["pyghmi"]
 
 [project.optional-dependencies]
+all = ["virtbmc_core[dev,test,typing,docs]"]
 dev = ["black", "ruff", "isort"]
+test = ["pytest"]
 typing = ["mypy"]
+docs = ["mkdocs-material"]
 
 [project.urls]
 Home = "https://github.com/chramb/virtbmc"
