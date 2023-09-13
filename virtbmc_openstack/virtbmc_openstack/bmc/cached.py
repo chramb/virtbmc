@@ -35,7 +35,7 @@ class CachedBMC(BaseOpenStackBMC):
             return CODE.SUCCESS
 
         try:
-            self.server.stop(self.conn)
+            self.server.stop(self.conn.compute)
             self.server.status = "SHUTOFF"
             return CODE.SUCCESS
 
@@ -43,7 +43,7 @@ class CachedBMC(BaseOpenStackBMC):
             self._refresh_cache.start()
             return CODE.COMMAND_NOT_SUPPORTED_IN_PRESENT_STATE
 
-    def power_on(self, refresh: bool = True) -> int:
+    def power_on(self) -> int:
         if self._refresh_cache.is_alive():
             return CODE.NODE_BUSY
 
@@ -51,7 +51,7 @@ class CachedBMC(BaseOpenStackBMC):
             return CODE.SUCCESS
 
         try:
-            self.server.start(self.conn)
+            self.server.start(self.conn.compute)
             self.server.status = "ACTIVE"
             return CODE.SUCCESS
 
