@@ -58,7 +58,7 @@ class UnsafeBMC(BaseOpenStackBMC):
         task = Thread(
             name="power_on",
             target=self.wrap_unsafe,
-            args=(self.server.stop, self.conn.compute),
+            args=(self.server.start, self.conn.compute),
         )
         task.start()
         self.server.status = "ACTIVE"
