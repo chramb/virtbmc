@@ -44,6 +44,7 @@ class UnsafeBMC(BaseOpenStackBMC):
             args=(self.server.stop, self.conn.compute),
         )
         task.start()
+        self.server.status = "SHUTOFF"
         return CODE.SUCCESS
 
     def power_on(self) -> int:
@@ -62,6 +63,7 @@ class UnsafeBMC(BaseOpenStackBMC):
             args=(self.server.stop, self.conn.compute),
         )
         task.start()
+        self.server.status = "ACTIVE"
         return CODE.SUCCESS
 
     def power_reset(self) -> int:
