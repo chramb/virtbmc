@@ -50,9 +50,11 @@ class BaseOpenStackBMC(Bmc):
         # TODO: add timeout when connecting for too long
         self.conn = openstack.connect(cloud=self.cloud)
         server: Optional[Server] = self.conn.compute.find_server(self.name)
+
         if server is None:
             log.error(f"server: {self.name} not found in the cloud, stopping bmc")
             self.stop()
+
         else:
             if server.task_state is not None:
                 log.warning(
@@ -61,8 +63,9 @@ class BaseOpenStackBMC(Bmc):
                 self._wait_for_idle()
 
             self.server = server
-            log.info(f"{self.name} started with connection to cloud")
+
             super().start(timeout=timeout)
+            log.info(f"{self.name} started with connection to cloud")
 
     def stop(self) -> None:
         self.conn.close()
@@ -79,17 +82,20 @@ class BaseOpenStackBMC(Bmc):
             f"vm_state: {self.server.vm_state}; "
             f"task_state: {self.server.task_state};"
         )
+
         if self.server is None:
             log.error("server stopped existing in meantime, exiting")
+
             if not self._stopped:
                 self.stop()
+
         self.server = server
 
     def _wait_for_idle(self, interval: float = 2) -> None:
         while self.server.task_state:
             self._refresh_server_state()
 
-            if self.server.task_state:
+            if self.server.task_state is not None:
                 time.sleep(interval)
 
     # BMC Operations

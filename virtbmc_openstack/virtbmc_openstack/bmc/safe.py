@@ -19,10 +19,10 @@ class SafeBMC(BaseOpenStackBMC):
     def is_active(self) -> bool:
         log.debug("is_active: called")
         self._refresh_server_state()
+
         return (
             self.server.status == "ACTIVE"
             and self.server.task_state is None
-            #
             or self.server.task_state == "powering-on"
         )
 
@@ -33,15 +33,17 @@ class SafeBMC(BaseOpenStackBMC):
     def power_off(self) -> int:
         log.debug("power_off: called")
         self._refresh_server_state()
+
         if (
             self.server.status == "SHUTOFF"
             and self.server.task_state is None
-            #
             or self.server.task_state == "powering-off"
         ):
             return CODE.SUCCESS
+
         if self.server.task_state:
             return CODE.NODE_BUSY
+
         if self.server.status == "ACTIVE":
             self.server.stop(self.conn.compute)
             return CODE.SUCCESS
@@ -50,16 +52,10 @@ class SafeBMC(BaseOpenStackBMC):
 
     def power_on(self, refresh: bool = True) -> int:
         log.debug("power_on: called")
-
         if refresh:
             self._refresh_server_state()
 
-        if (
-            self.server.status != "SHUTOFF"
-            and self.server.task_state is None
-            #
-            or self.server.task_state == "powering-on"
-        ):
+        if self.is_active():
             return CODE.SUCCESS
 
         if self.server.task_state:
@@ -73,7 +69,6 @@ class SafeBMC(BaseOpenStackBMC):
 
     def power_reset(self) -> int:
         log.debug("power_reset: called")
-
         self._refresh_server_state()
 
         if self.server.status == "REBOOT":
@@ -96,7 +91,6 @@ class SafeBMC(BaseOpenStackBMC):
 
     def power_cycle(self) -> int:
         log.debug("power_cycle: called")
-
         self._refresh_server_state()
 
         if self.server.status == "HARD_REBOOT":
@@ -121,5 +115,6 @@ class SafeBMC(BaseOpenStackBMC):
     def power_shutdown(self) -> int:
         # Should attempt a clean shutdown but openstack doesn't know the difference
         log.debug("power_shutdown: called")
+
         self.power_off()
         return CODE.SUCCESS
