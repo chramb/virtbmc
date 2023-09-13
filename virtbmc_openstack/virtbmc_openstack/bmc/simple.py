@@ -20,14 +20,14 @@ class SimpleBMC(BaseOpenStackBMC):
 
     def power_off(self) -> int:
         try:
-            self.server.stop(self.conn)
+            self.server.stop(self.conn.compute)
             return CODE.SUCCESS
         except openstack.exceptions.ConflictException:
             return CODE.COMMAND_NOT_SUPPORTED_IN_PRESENT_STATE
 
     def power_on(self, refresh: bool = True) -> int:
         try:
-            self.server.start(self.conn)
+            self.server.start(self.conn.compute)
             return CODE.SUCCESS
         except openstack.exceptions.ConflictException:
             return CODE.COMMAND_NOT_SUPPORTED_IN_PRESENT_STATE
