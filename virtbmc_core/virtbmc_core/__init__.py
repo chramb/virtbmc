@@ -1,1 +1,3 @@
-from .bmc import Bmc  # noqa: F401
+from .bmc import Bmc
+
+__all__ = ["Bmc"]
