@@ -20,7 +20,7 @@ class UnsafeBMC(BaseOpenStackBMC):
     def is_active(self) -> bool:
         return self.server.status == "ACTIVE"
 
-    def wrap_unsafe(
+    def wrap_unsafe(  # type: ignore[no-untyped-def]
         self, cmd: Callable[[Any], Any], *args, **kwargs  # noqa ANN002
     ) -> None:
         try:

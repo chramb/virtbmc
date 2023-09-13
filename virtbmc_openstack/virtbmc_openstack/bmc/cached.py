@@ -17,7 +17,9 @@ class CachedBMC(BaseOpenStackBMC):
     mode: str = "cached"
     _refresh_cache: threading.Thread
 
-    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
+    def __init__(  # type: ignore[no-untyped-def]
+        self, *args, **kwargs  # noqa: ANN002, ANN003
+    ) -> None:
         super().__init__(*args, **kwargs)
         # initialize thread in addition to all the normal behaviour
         self._refresh_cache = threading.Thread(target=self._wait_for_idle)
