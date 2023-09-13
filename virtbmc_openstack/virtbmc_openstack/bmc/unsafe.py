@@ -4,9 +4,6 @@ import logging
 from threading import Thread
 from typing import Any, Callable
 
-import openstack
-import openstack.exceptions
-
 from virtbmc_core.constants import IPMI_COMPLETION_CODES as CODE
 from virtbmc_openstack.bmc import BaseOpenStackBMC
 
@@ -25,7 +22,8 @@ class UnsafeBMC(BaseOpenStackBMC):
     ) -> None:
         try:
             cmd(*args, **kwargs)
-        except openstack.exceptions.ConflictException:
+        except Exception as e:
+            log.error(f"encountered issue {e}")
             self._wait_for_idle()
 
     def power_off(self) -> int:
