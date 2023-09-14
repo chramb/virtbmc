@@ -20,11 +20,7 @@ class SafeBMC(BaseOpenStackBMC):
         log.debug("is_active: called")
         self._refresh_server_state()
 
-        return (
-            self.server.status == "ACTIVE"
-            and self.server.task_state is None
-            or self.server.task_state == "powering-on"
-        )
+        return self.server.status == "ACTIVE"
 
     def get_power_state(self) -> Literal["on", "off"]:
         log.debug("get_power_state: called")
