@@ -39,8 +39,8 @@ def handle_nova_exception(
 
 class OpenStackBMC(Bmc):
     driver: str = "openstack"
-    server: Server
-    conn: Connection
+    _server: Server
+    _conn: Connection
 
     def __init__(
         self,
@@ -58,11 +58,11 @@ class OpenStackBMC(Bmc):
     def start(self, timeout: int = 30) -> None:
         # TODO: add timeout when connecting for too long
 
-        self.conn = openstack.connect(cloud=self.cloud)
-        server: Optional[Server] = self.conn.compute.find_server(self.name)
+        self._conn = openstack.connect(cloud=self.cloud)
+        server: Optional[Server] = self._conn.compute.find_server(self.name)
 
         if server is not None:
-            self.server = server
+            self._server = server
 
             log.info(f"{self.name} started with connection to cloud")
             super().start(timeout=timeout)
@@ -72,28 +72,28 @@ class OpenStackBMC(Bmc):
             self.stop()
 
     def stop(self) -> None:
-        self.conn.close()
+        self._conn.close()
         super().stop()
 
     # BMC Operations
     # ref: 28.3 Chassis Control Command: https://www.intel.com/content/dam/www/public/us/en/documents/specification-updates/ipmi-intelligent-platform-mgt-interface-spec-2nd-gen-v2-0-spec-update.pdf
     def is_active(self) -> bool:
-        server = self.conn.compute.get_server(self.server)
+        server = self._conn.compute.get_server(self._server)
         log.debug(
             "Refreshed server status: current server "
-            f"status: {self.server.status}; "
-            f"vm_state: {self.server.vm_state}; "
-            f"task_state: {self.server.task_state};"
+            f"status: {self._server.status}; "
+            f"vm_state: {self._server.vm_state}; "
+            f"task_state: {self._server.task_state};"
         )
 
-        if self.server is None:
+        if self._server is None:
             log.error("Server stopped existing in meantime, stopping the bmc")
 
             if not self._stopped:
                 self.stop()
 
-        self.server = server
-        return self.server.status == "ACTIVE"
+        self._server = server
+        return self._server.status == "ACTIVE"
 
     def cold_reset(self) -> CODE:
         log.debug("cold_reset: caleld, stopping BMC")
@@ -106,7 +106,7 @@ class OpenStackBMC(Bmc):
 
     def power_off(self) -> CODE:
         try:
-            self.server.stop(self.conn.compute)
+            self._server.stop(self._conn.compute)
             return CODE.SUCCESS
 
         except openstack.exceptions.ConflictException as e:
@@ -114,14 +114,14 @@ class OpenStackBMC(Bmc):
 
     def power_on(self) -> CODE:
         try:
-            self.server.start(self.conn.compute)
+            self._server.start(self._conn.compute)
             return CODE.SUCCESS
         except openstack.exceptions.ConflictException as e:
             return handle_nova_exception(e, ("active", "powering-on"))
 
     def power_reset(self) -> CODE:
         try:
-            self.server.reboot(self.conn.compute, "SOFT")
+            self._server.reboot(self._conn.compute, "SOFT")
             return CODE.SUCCESS
         except openstack.exceptions.ConflictException as e:
             return handle_nova_exception(
@@ -130,7 +130,7 @@ class OpenStackBMC(Bmc):
 
     def power_cycle(self) -> CODE:
         try:
-            self.server.reboot(self.conn.compute, "SOFT")
+            self._server.reboot(self._conn.compute, "SOFT")
             return CODE.SUCCESS
         except openstack.exceptions.ConflictException as e:
             return handle_nova_exception(
