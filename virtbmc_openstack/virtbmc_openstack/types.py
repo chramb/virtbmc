@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import Literal, TypedDict
 
 # fmt: off
 status = Literal[
@@ -24,3 +24,12 @@ task_state = Literal[
     "shelving", "shelving_image_pending_upload", "shelving_image_uploading",
     "shelving_offloading", "unshelving"]
 # fmt: on
+
+
+class Config(TypedDict):
+    driver: Literal["openstack"]
+    name: str
+    username: str
+    password: str
+    port: int
+    address: str
