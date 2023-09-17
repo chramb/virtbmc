@@ -6,7 +6,7 @@ import pyghmi.ipmi.bmc as _bmc
 import pyghmi.ipmi.private.session as _ipmisession
 
 if TYPE_CHECKING:
-    from typing import Dict, Union
+    from virtbmc_core.types import Config
 
 
 class Bmc(_bmc.Bmc):
@@ -38,7 +38,7 @@ class Bmc(_bmc.Bmc):
     def stop(self) -> None:
         self._stopped = True
 
-    def config(self) -> Dict[str, Union[str, int, None]]:
+    def config(self) -> Config:
         return {
             "driver": getattr(self, "driver", None),
             **{k: v for k, v in vars(self).items() if not k.startswith("_")},
