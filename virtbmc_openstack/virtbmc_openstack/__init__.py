@@ -29,9 +29,11 @@ def handle_nova_exception(
 ) -> CODE:
     if exception.details is not None:
         received_state: Union[error_vm_states, str] = exception.details.split(" ")[-1]
+
         if received_state in desired_states:
             return CODE.SUCCESS
 
+    log.error(f"Recived exception outside of 'desired_states': {exception}")
     return CODE.COMMAND_NOT_SUPPORTED_IN_PRESENT_STATE
 
 
