@@ -23,6 +23,8 @@ class Bmc(_bmc.Bmc):
         self.username = username
         self.password = password
         self.port = port
+        if port < 0 or port > 65535:
+            raise ValueError("Invalid port number")
         self.address = address
 
     def start(self, timeout: int = 30) -> None:
