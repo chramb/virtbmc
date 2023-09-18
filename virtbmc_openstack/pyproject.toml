@@ -27,3 +27,6 @@ dependencies = ["virtbmc_core", "openstacksdk"]
 
 [project.urls]
 Home = "https://github.com/chramb/virtbmc"
+
+[project.entry-points."virtbmc.driver"]
+openstack = "virtbmc_openstack:OpenStackBMC"
