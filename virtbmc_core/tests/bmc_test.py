@@ -22,6 +22,7 @@ def test_bmc_config() -> None:
         "password": "password",
         "port": 623,
         "address": "::",
+        "active": False,
     }
     bmc = TestBmc()
     assert bmc.config() == expected_config
@@ -51,3 +52,16 @@ def test_bmc_start() -> None:
 def test_invalid_port(port: int) -> None:
     with pytest.raises(ValueError):
         Bmc(port=port)
+
+
+@pytest.mark.parametrize("address", ("some text",))
+def test_invalid_address(address: str) -> None:
+    with pytest.raises(ValueError):
+        Bmc(address=address)
+
+
+def test_race_condition() -> None:
+    bmc = Bmc(port=1026)
+    th = threading.Thread(target=bmc.start, daemon=False)
+    th.start()
+    bmc.stop()
