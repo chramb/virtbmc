@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from ipaddress import ip_address
 from typing import TYPE_CHECKING
 
 import pyghmi.ipmi.bmc as _bmc
@@ -11,7 +12,6 @@ if TYPE_CHECKING:
 
 class Bmc(_bmc.Bmc):
     driver: str
-    _stopped: bool = False
 
     def __init__(
         self,
@@ -20,12 +20,18 @@ class Bmc(_bmc.Bmc):
         port: int = 623,
         address: str = "::",
     ) -> None:
+        self._stopped: bool = False
         self.username = username
         self.password = password
-        self.port = port
+
         if port < 0 or port > 65535:
-            raise ValueError("Invalid port number")
-        self.address = address
+            raise ValueError("Invalid value in the port field")
+        self.port = port
+
+        try:
+            self.address = str(ip_address(address))
+        except ValueError:
+            raise ValueError("Invalid value in the ip address field")
 
     def start(self, timeout: int = 30) -> None:
         super().__init__(
