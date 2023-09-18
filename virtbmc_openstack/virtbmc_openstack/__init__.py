@@ -39,8 +39,6 @@ def handle_nova_exception(
 
 class OpenStackBMC(Bmc):
     driver: str = "openstack"
-    _server: Server
-    _conn: Connection
 
     def __init__(
         self,
@@ -52,6 +50,8 @@ class OpenStackBMC(Bmc):
         address: str = "::",
     ) -> None:
         super().__init__(username, password, port, address)
+        self._server: Server
+        self._conn: Connection
         self.name = name
         self.cloud = cloud
 
@@ -93,7 +93,7 @@ class OpenStackBMC(Bmc):
                 self.stop()
 
         self._server = server
-        return self._server.status == "ACTIVE"
+        return self._server.status != "SHUTOFF"
 
     def cold_reset(self) -> CODE:
         log.debug("cold_reset: caleld, stopping BMC")
