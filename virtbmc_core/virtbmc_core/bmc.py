@@ -7,7 +7,12 @@ import pyghmi.ipmi.bmc as _bmc
 import pyghmi.ipmi.private.session as _ipmisession
 
 if TYPE_CHECKING:
+    from argparse import Namespace, _ActionsContainer
+    from typing import TypeVar
+
     from virtbmc_core.types import Config
+
+    ActionsContainer = TypeVar("ActionsContainer", bound=_ActionsContainer)
 
 
 class Bmc(_bmc.Bmc):
@@ -54,3 +59,17 @@ class Bmc(_bmc.Bmc):
             "driver": getattr(self, "driver", None),
             **{k: v for k, v in vars(self).items() if not k.startswith("_")},
         }
+
+    @staticmethod
+    def cli(parser: ActionsContainer) -> ActionsContainer:
+        # fmt: off
+        parser.add_argument("-u","--username", default="admin", type=str, action="store", help="The BMC username (default: admin)")  # noqa: E501
+        parser.add_argument("-P","--password", default="password", type=str, action="store", help="The BMC password (default: password)")  # noqa: E501
+        parser.add_argument("-p","--port", default=623, type=int, action="store", help="Port to listen on (default: 623)")  # noqa: E501
+        parser.add_argument("-a","--address", default="::", type=str, action="store", help="Address to listen on (default: '::')")  # noqa: E501
+        # fmt: on
+        return parser
+
+    @staticmethod
+    def from_namespace(namespace: Namespace) -> Bmc:
+        raise NotImplementedError
