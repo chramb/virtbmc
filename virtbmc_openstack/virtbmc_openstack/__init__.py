@@ -10,17 +10,19 @@ from virtbmc_core import Bmc
 from virtbmc_core.constants import IPMI_COMPLETION_CODES as CODE
 
 if TYPE_CHECKING:
+    from argparse import Namespace
     from logging import Logger
     from typing import Literal, Optional, Sequence, Union
 
     from openstack.compute.v2.server import Server
     from openstack.connection import Connection
 
+    from virtbmc_core.bmc import ActionsContainer
     from virtbmc_openstack.types import task_state, vm_state
 
     error_vm_states = Union[task_state, vm_state]
 
-log: Logger = logging.getLogger(__name__)
+log: Logger = logging.getLogger("virtbmc.driver.openstack")
 
 
 def handle_nova_exception(
@@ -74,6 +76,26 @@ class OpenStackBMC(Bmc):
     def stop(self) -> None:
         self._conn.close()
         super().stop()
+
+    @staticmethod
+    def cli(parser: ActionsContainer, os_cloud: bool = True) -> ActionsContainer:
+        # fmt: off
+        if os_cloud:
+            parser.add_argument("--os-cloud", metavar="NAME", help="Named cloud to connect to")  # noqa: E501
+        parser.add_argument("server", action="store", help="Name or uuid of managed server")  # noqa: E501
+        # fmt: on
+        return Bmc.cli(parser)
+
+    @staticmethod
+    def from_namespace(namespace: Namespace) -> OpenStackBMC:
+        return OpenStackBMC(
+            name=namespace.server,
+            address=namespace.address,
+            port=namespace.port,
+            username=namespace.username,
+            password=namespace.password,
+            cloud=namespace.os_cloud,
+        )
 
     # BMC Operations
     # ref: 28.3 Chassis Control Command: https://www.intel.com/content/dam/www/public/us/en/documents/specification-updates/ipmi-intelligent-platform-mgt-interface-spec-2nd-gen-v2-0-spec-update.pdf

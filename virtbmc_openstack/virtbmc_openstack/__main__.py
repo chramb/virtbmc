@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING
 
 import openstack
 
-from virtbmc_core.cli import bmc_options
 from virtbmc_core.log import log_format
 from virtbmc_openstack import OpenStackBMC
 
@@ -15,7 +14,7 @@ if TYPE_CHECKING:
     from argparse import Namespace
     from typing import Optional, Sequence
 
-log: logging.Logger = logging.getLogger("virtbmc_openstack")
+log: logging.Logger = logging.getLogger("virtbmc.driver.openstack")
 
 
 def main(args: Optional[Sequence[str]] = None) -> int:
@@ -25,12 +24,12 @@ def main(args: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("-V","--version", action="version",version=importlib.metadata.version(__package__), help="Show program's version number and exit")  # noqa: E501
     parser.add_argument("-d","--debug", action="store_true", help="Enable logging debug information to console")  # noqa: E501
     parser.add_argument("--os-debug", action="store_true", help="Enable logging debug information for openstacksdk")  # noqa: E501
+    _ = openstack.connect(options=parser)  # type: ignore
 
-    parser, group = bmc_options(parser)
-    group.add_argument("server", action="store", help="Name or uuid of managed server")  # noqa: E501
+    group = parser.add_argument_group("VirtBMC Options")
+    group= OpenStackBMC.cli(group, os_cloud=False)
     # fmt: on
 
-    _ = openstack.connect(options=parser)  # type: ignore
     parsed: Namespace = parser.parse_args(args=args)
     log_format(log)
 
@@ -43,14 +42,7 @@ def main(args: Optional[Sequence[str]] = None) -> int:
 
     bmc = None
     try:
-        bmc = OpenStackBMC(
-            name=parsed.server,
-            address=parsed.address,
-            port=parsed.port,
-            username=parsed.username,
-            password=parsed.password,
-            cloud=parsed.os_cloud,
-        )
+        bmc = OpenStackBMC.from_namespace(parsed)
         bmc.start()
 
     except KeyboardInterrupt:
