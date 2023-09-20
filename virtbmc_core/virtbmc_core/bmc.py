@@ -26,7 +26,6 @@ class Bmc(_bmc.Bmc):
         address: str = "::",
     ) -> None:
         self._stopped: bool = False
-        self.active: bool = False
         self.username = username
         self.password = password
 
@@ -40,7 +39,6 @@ class Bmc(_bmc.Bmc):
             raise ValueError("Invalid value in the ip address field")
 
     def start(self, timeout: int = 30) -> None:
-        self.active = True
         super().__init__(
             authdata={self.username: self.password},
             address=self.address,
@@ -51,7 +49,6 @@ class Bmc(_bmc.Bmc):
             _ipmisession.Session.wait_for_rsp(timeout)  # pragma: no cover
 
     def stop(self) -> None:
-        self.active = False
         self._stopped = True
 
     def config(self) -> Config:

@@ -22,7 +22,6 @@ def test_bmc_config() -> None:
         "password": "password",
         "port": 623,
         "address": "::",
-        "active": False,
     }
     bmc = TestBmc()
     assert bmc.config() == expected_config
