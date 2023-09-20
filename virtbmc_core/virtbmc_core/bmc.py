@@ -29,6 +29,7 @@ class Bmc(_bmc.Bmc):
         self.active: bool = False
         self.username = username
         self.password = password
+        self.active = False
 
         if port < 0 or port > 65535:
             raise ValueError("Invalid value in the port field")
