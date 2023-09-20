@@ -28,7 +28,6 @@ def main(args: Optional[Sequence[str]] = None) -> int:
 
     group = parser.add_argument_group("VirtBMC Options")
     group= OpenStackBMC.cli(group, os_cloud=False)
-    group.add_argument("name", action="store", help="Name or uuid of managed server")  # noqa: E501
     # fmt: on
 
     parsed: Namespace = parser.parse_args(args=args)

@@ -82,13 +82,14 @@ class OpenStackBMC(Bmc):
         # fmt: off
         if os_cloud:
             parser.add_argument("--os-cloud", metavar="NAME", help="Named cloud to connect to")  # noqa: E501
+        parser.add_argument("server", action="store", help="Name or uuid of managed server")  # noqa: E501
         # fmt: on
         return Bmc.cli(parser)
 
     @staticmethod
     def from_namespace(namespace: Namespace) -> OpenStackBMC:
         return OpenStackBMC(
-            name=namespace.name,
+            name=namespace.server,
             address=namespace.address,
             port=namespace.port,
             username=namespace.username,
