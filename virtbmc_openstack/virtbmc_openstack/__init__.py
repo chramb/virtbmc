@@ -152,7 +152,7 @@ class OpenStackBMC(Bmc):
 
     def power_cycle(self) -> CODE:
         try:
-            self._server.reboot(self._conn.compute, "SOFT")
+            self._server.reboot(self._conn.compute, "HARD")
             return CODE.SUCCESS
         except openstack.exceptions.ConflictException as e:
             return handle_nova_exception(
