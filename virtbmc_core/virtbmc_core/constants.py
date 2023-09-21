@@ -33,3 +33,21 @@ class IPMI_COMPLETION_CODES(IntEnum):
     CANNOT_EXECUTE_COMMAND_BECAUSE_SUBFUNCTION_DISABLED_OR_UNAVAILABLE = 0xD6
     UNSPECIFIED = 0xFF
     TIMEOUT = 0xFFFF  # not ipmi, but used internally
+
+
+class BOOT_DEVICES(IntEnum):
+    NET = 4
+    NETWORK = 4
+    PXE = 4
+    HD = 8
+    SAFE = 0xC
+    CD = 0x14
+    CDROM = 0x14
+    OPTICAL = 0x14
+    DVD = 0x14
+    FLOPPY = 0x3C
+    USB = 0x3C
+    DEFAULT = 0x0
+    SETUP = 0x18
+    BIOS = 0x18
+    F1 = 0x18
