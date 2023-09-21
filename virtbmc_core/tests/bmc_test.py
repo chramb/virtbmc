@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import threading
+from argparse import Namespace
 from typing import TYPE_CHECKING
 
 import pytest
@@ -64,3 +65,8 @@ def test_race_condition() -> None:
     th = threading.Thread(target=bmc.start, daemon=False)
     th.start()
     bmc.stop()
+
+
+def test_not_implemented() -> None:
+    with pytest.raises(expected_exception=NotImplementedError):
+        _ = Bmc.from_namespace(Namespace())
