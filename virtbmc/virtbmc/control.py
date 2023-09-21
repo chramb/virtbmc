@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from virtbmc.db.toml import TomlDB
 from virtbmc.driver import driver
-from virtbmc.manager.threading import ThreadingManager
+from virtbmc.manager import threading
 
 if TYPE_CHECKING:
     from typing import Optional, Tuple
@@ -16,15 +16,14 @@ if TYPE_CHECKING:
     from virtbmc_core.types import Config as BmcConfig
 
 # in future create single connection and reuse it
-manager: Manager = ThreadingManager()  # TODO: support different when config is finished
+manager: Manager = threading  # TODO: support different when config is finished
 db: Database = TomlDB()
 save_defaults: bool = True  # should be config option
 
 
 def init() -> None:
-    for bmc_config in db.all():
-        if bmc_config.get("active", False):
-            manager.start(bmc_config["name"])
+    for bmc_config in db.get_active():
+        manager.start(bmc_config["name"])
 
 
 def create(bmc_config: BmcConfig) -> None:
@@ -73,4 +72,4 @@ def get(name: str) -> Optional[BmcConfig]:
 
 
 def get_all() -> Tuple[BmcConfig, ...]:
-    return tuple(x for x in db.all())
+    return tuple(x for x in db.get_all())

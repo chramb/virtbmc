@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
     from virtbmc_core.types import Config as BmcConfig
 
-    class _Client:
+    class _RPC:
         # fmt: off
         def bmc_create(self, bmc_config: BmcConfig) -> None:...
         def bmc_delete(self, name: str) -> None:...
@@ -19,11 +19,11 @@ if TYPE_CHECKING:
         # fmt: on
 
 else:
-    _Client = object
+    _RPC = object
 
 
 # TODO: annotate wit hif TC:obj -> Protocol
-class Client(BaseManager, _Client):
+class Client(BaseManager, _RPC):
     pass
 
 

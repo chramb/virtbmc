@@ -13,7 +13,7 @@ from virtbmc.config import CONFIG
 
 if TYPE_CHECKING:
     from pathlib import Path
-    from typing import Generator, Optional
+    from typing import Iterator, Optional, Tuple
 
     from virtbmc.db import Database
     from virtbmc_core.types import Config as BmcConfig
@@ -47,7 +47,6 @@ class TomlDB(Database):
     def start(self, name: str) -> None:
         with self._file(name).open("wb") as f:
             config = tomllib.load(f)
-            print(config)
             config["active"] = True
             tomli_w.dump(config, f)
             return
@@ -59,11 +58,25 @@ class TomlDB(Database):
             tomli_w.dump(config, f)
             return
 
-    def all(self) -> Generator[BmcConfig, None, None]:
-        for fl in self.db.iterdir():
-            if fl.suffix == ".toml":
-                with fl.open("rb") as f:
+    def _all(self) -> Iterator[BmcConfig]:
+        for f in self.db.iterdir():
+            if f.suffix == ".toml":
+                with f.open("rb") as f:
                     yield tomllib.load(f)
+
+    def get_all(self) -> Tuple[BmcConfig, ...]:
+        return tuple(cfg for cfg in self._all())
+
+    def _active(self) -> Iterator[BmcConfig]:
+        for f in self.db.iterdir():
+            if f.suffix == ".toml":
+                with f.open("rb") as f:
+                    config = tomllib.load(f)
+                    if config.get("active", False):
+                        yield config
+
+    def get_active(self) -> Tuple[BmcConfig, ...]:
+        return tuple(cfg for cfg in self._active())
 
     def _file(self, name: str) -> Path:
         return self.db / (name + ".toml")
