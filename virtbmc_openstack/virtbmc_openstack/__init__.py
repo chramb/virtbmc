@@ -101,12 +101,6 @@ class OpenStackBMC(Bmc):
     # ref: 28.3 Chassis Control Command: https://www.intel.com/content/dam/www/public/us/en/documents/specification-updates/ipmi-intelligent-platform-mgt-interface-spec-2nd-gen-v2-0-spec-update.pdf
     def is_active(self) -> bool:
         server = self._conn.compute.get_server(self._server)
-        log.debug(
-            "Refreshed server status: current server "
-            f"status: {self._server.status}; "
-            f"vm_state: {self._server.vm_state}; "
-            f"task_state: {self._server.task_state};"
-        )
 
         if self._server is None:
             log.error("Server stopped existing in meantime, stopping the bmc")
@@ -114,8 +108,22 @@ class OpenStackBMC(Bmc):
             if not self._stopped:
                 self.stop()
 
+            return False
+
+        log.debug(
+            "Refreshed server status: current server "
+            f"status: {self._server.status}; "
+            f"vm_state: {self._server.vm_state}; "
+            f"task_state: {self._server.task_state};"
+        )
+
         self._server = server
-        return self._server.status != "SHUTOFF"
+        return (
+            self._server.status == "ACTIVE"
+            and self._server.task_state is None
+            or self._server.status == "SHUTOFF"
+            and self._server.task_state == "powering-on"
+        )
 
     def cold_reset(self) -> CODE:
         log.debug("cold_reset: caleld, stopping BMC")
