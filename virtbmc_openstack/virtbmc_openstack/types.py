@@ -23,6 +23,11 @@ task_state = Literal[
     "rebuild_spawning", "migrating", "deleting", "soft-deleting", "restoring",
     "shelving", "shelving_image_pending_upload", "shelving_image_uploading",
     "shelving_offloading", "unshelving"]
+
+ipmi_boot_device = Literal[
+    'net', 'network', 'pxe', 'hd', 'safe', 'cd',
+    'cdrom', 'optical', 'dvd', 'floppy','usb',
+    'default', 'setup', 'bios', 'f1']
 # fmt: on
 
 

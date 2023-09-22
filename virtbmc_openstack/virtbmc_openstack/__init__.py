@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from openstack.connection import Connection
 
     from virtbmc_core.bmc import ActionsContainer
-    from virtbmc_openstack.types import task_state, vm_state
+    from virtbmc_openstack.types import ipmi_boot_device, task_state, vm_state
 
     error_vm_states = Union[task_state, vm_state]
 
@@ -62,7 +62,6 @@ class OpenStackBMC(Bmc):
 
         self._conn = openstack.connect(cloud=self.cloud)
         server: Optional[Server] = self._conn.compute.find_server(self.name)
-
         if server is not None:
             self._server = server
 
@@ -169,3 +168,26 @@ class OpenStackBMC(Bmc):
 
     def power_shutdown(self) -> int:
         return self.power_off()
+
+    def get_boot_device(self) -> ipmi_boot_device:
+        try:
+            pxe_first = self._server.get_metadata_item(
+                self._conn.compute, "libvirt:pxe-first"
+            ).metadata.get(  # type: ignore
+                "libvirt:pxe-first", ""
+            )
+        except openstack.exceptions.ResourceNotFound:
+            pxe_first = ""
+
+        if pxe_first == "1":
+            return "network"
+        else:
+            return "hd"
+
+    def set_boot_device(self, bootdevice: ipmi_boot_device) -> None:
+        if bootdevice == "hd":
+            self._server.set_metadata_item(self._conn.compute, "libvirt:pxe-first", "")
+        elif bootdevice in ["network", "net", "pxe"]:
+            self._server.set_metadata_item(self._conn.compute, "libvirt:pxe-first", "1")
+        else:
+            log.error(f"unsupported boot device: {bootdevice}, skipping command")
