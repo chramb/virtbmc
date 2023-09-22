@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 import openstack
 import pytest
-from _mock_openstack import MockConnection, MockServer, mock_connect
+from ._mock_openstack import MockConnection, MockServer, mock_connect
 from openstack.exceptions import ConflictException
 
 from virtbmc_core.constants import IPMI_COMPLETION_CODES as CODE

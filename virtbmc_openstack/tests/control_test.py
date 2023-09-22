@@ -5,7 +5,7 @@ from argparse import ArgumentParser, Namespace
 from typing import TYPE_CHECKING
 
 import openstack
-from _mock_openstack import MockConnection, MockServer, mock_connect
+from ._mock_openstack import MockConnection, MockServer, mock_connect
 
 from virtbmc_openstack import OpenStackBMC
 
