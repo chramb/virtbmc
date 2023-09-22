@@ -126,7 +126,7 @@ class OpenStackBMC(Bmc):
         )
 
     def cold_reset(self) -> CODE:
-        log.debug("cold_reset: caleld, stopping BMC")
+        log.debug("cold_reset: called, stopping BMC")
         self.stop()
         return CODE.SUCCESS
 
