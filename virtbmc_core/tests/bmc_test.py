@@ -49,7 +49,7 @@ def test_bmc_start_stop() -> None:
         pass
 
 
-@pytest.mark.parametrize("port", (-1, 65536))
+@pytest.mark.parametrize("port", (-1, 65536, "str"))
 def test_invalid_port(port: int) -> None:
     with pytest.raises(ValueError):
         Bmc(port=port)

@@ -28,10 +28,13 @@ class Bmc(_bmc.Bmc):
         self._stopped: bool = False
         self.username = username
         self.password = password
+        try:
+            self.port = int(port)
+        except ValueError:
+            raise ValueError("Invalid argument for port parameter")
 
-        if port < 0 or port > 65535:
-            raise ValueError("Invalid value in the port field")
-        self.port = port
+        if self.port < 0 or self.port > 65535:
+            raise ValueError("Invalid value in the port parameter")
 
         try:
             self.address = str(ip_address(address))
