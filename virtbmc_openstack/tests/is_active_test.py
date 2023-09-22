@@ -36,20 +36,18 @@ states: Tuple[Tuple[status, vm_state, Optional[task_state], bool], ...] = (
 )
 
 
-@pytest.mark.parametrize("bmc_stopped", (True, False))
 @pytest.mark.parametrize(("status", "vm_state", "task_state", "is_active"), states)
 def test_is_active(
     status: status,
     vm_state: vm_state,
     task_state: task_state,
     is_active: bool,
-    bmc_stopped: bool,
 ) -> None:
     bmc = OpenStackBMC("test")
     server = MockServer(status, vm_state, task_state)
     bmc._conn = MockConnection(server)  # type: ignore
     bmc._server = server  # type: ignore
-    bmc._stopped = bmc_stopped
+    bmc._stopped = False
     assert bmc.is_active() == is_active
 
 
@@ -57,4 +55,12 @@ def test_is_active_no_server() -> None:
     bmc = OpenStackBMC("test")
     bmc._conn = MockConnection(None)  # type: ignore
     bmc._server = None  # type: ignore
+    assert bmc.is_active() is False
+
+
+def test_is_active_no_server_still_on() -> None:
+    bmc = OpenStackBMC("test")
+    bmc._conn = MockConnection(None)  # type: ignore
+    bmc._server = None  # type: ignore
+    bmc._stopped = True
     assert bmc.is_active() is False
