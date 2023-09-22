@@ -35,7 +35,7 @@ def test_bmc_stop() -> None:
     assert bmc._stopped is True
 
 
-def test_bmc_start() -> None:
+def test_bmc_start_stop() -> None:
     bmc = Bmc(port=1025)
     t = threading.Thread(target=bmc.start, daemon=False)
     assert bmc._stopped is False
@@ -44,6 +44,7 @@ def test_bmc_start() -> None:
     assert t.is_alive() is True
     # Cleanup
     bmc.stop()
+    assert bmc._stopped is True
     while t.is_alive():  # Wait for thread to stop properly
         pass
 
