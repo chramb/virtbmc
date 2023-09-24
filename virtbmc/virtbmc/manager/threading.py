@@ -27,7 +27,7 @@ def create(bmc_config: BmcConfig) -> None:
     # Assume config is valid and db doesn't contain given bmc["name"]
     _ = bmc_config.pop("active", None)
     bmc: Bmc = make_bmc(bmc_config)
-    _bmc_pool[bmc_config["name"]] = ThreadedBmc(bmc)
+    _bmc_pool[bmc_config["name"]] = ThreadedBmc(bmc, timeout=1)
 
 
 def delete(name: str) -> None:
@@ -43,13 +43,18 @@ def stop(name: str) -> None:
     _bmc_pool[name].stop()
 
 
+def exit() -> None:
+    for bmc in _bmc_pool.values():
+        bmc.stop()
+
+
 class ThreadedBmc:
     bmc: Bmc
     thread: Thread
 
-    def __init__(self, bmc: Bmc) -> None:
+    def __init__(self, bmc: Bmc, timeout: int = 30) -> None:
         self.bmc = bmc
-        self.thread = Thread(target=self.bmc.start)
+        self.thread = Thread(target=self.bmc.start, args=(timeout,))
         self._started: bool = False
 
     def start(self) -> None:
