@@ -40,8 +40,8 @@ class JsonDB(Database):
             log.error(f"failed to decode bmc config from {file.absolute()}")
             return None
 
-    def delete(self, name: str, ok_missing: bool = False) -> None:
-        self._file(name).unlink(ok_missing)
+    def delete(self, name: str, missing_ok: bool = False) -> None:
+        self._file(name).unlink(missing_ok)
 
     def update(self, name: str, settings: Mapping[str, Any]) -> None:
         with self._file(name).open("r+") as f:
