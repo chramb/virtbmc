@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from virtbmc.db.toml import TomlDB
-from virtbmc.driver import driver
+from virtbmc.db.json import JsonDB
+from virtbmc.driver import make_bmc
 from virtbmc.manager import threading
 
 if TYPE_CHECKING:
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 # in future create single connection and reuse it
 manager: Manager = threading  # TODO: support different when config is finished
-db: Database = TomlDB()
+db: Database = JsonDB()
 save_defaults: bool = True  # should be config option
 
 
@@ -27,24 +27,26 @@ def init() -> None:
 
 
 def create(bmc_config: BmcConfig) -> None:
-    if not isinstance(bmc_config.get("driver"), str):
-        raise Exception("invalid bmc config")
-    if not isinstance(name := bmc_config.get("name"), str):
-        raise Exception("invalid bmc config")
-    if db.read(name):
-        raise Exception("bmc already exists")
-    # V-- validation
-    full_bmc_config = driver[bmc_config.pop("driver")](**bmc_config).config()
-    config: BmcConfig = full_bmc_config if save_defaults else bmc_config
-
-    db.create(config)
+    if "name" not in bmc_config:
+        raise Exception("invalid bmc config missing key: 'name'")
+    if "driver" not in bmc_config:
+        raise Exception("invalid bmc config missing key: 'driver'")
+    if manager.get(bmc_config["name"]) or db.read(bmc_config["name"]):
+        raise Exception("Bmc with that name already exists")
+    config = make_bmc(bmc_config).config()  # validates config and driver
+    db.write(config)  # driver will overwrite so we don't care
     return
 
 
 def delete(name: str) -> None:
-    manager.delete(name)
-    db.delete(name)
-    return
+    if manager.get(name) is not None:
+        # ? TODO: error here and add --force in the future
+        manager.stop(name)
+        manager.delete(name)
+    try:
+        db.delete(name)  # db doesn't care if doesn't exist
+    except FileNotFoundError:
+        raise Exception("bmc with that name doesn't exist")
 
 
 # TODO: error checking
@@ -57,14 +59,17 @@ def start(name: str) -> None:
         manager.start(name)
     except PermissionError:
         raise Exception("Permission denied to start booho")
-    # db.start(name)
+    db.update(name, {"active": True})
     return
 
 
 def stop(name: str) -> None:
+    running_config = manager.get(name)
+    if running_config is None:
+        raise Exception("No BMC with that name is active")
     manager.stop(name)
-    db.stop(name)
-    return
+    manager.delete(name)
+    db.update(name, {"active": False})
 
 
 def get(name: str) -> Optional[BmcConfig]:

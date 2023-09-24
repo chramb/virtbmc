@@ -3,10 +3,10 @@ from __future__ import annotations
 from threading import Thread
 from typing import TYPE_CHECKING
 
-from virtbmc.driver import driver
+from virtbmc.driver import make_bmc
 
 if TYPE_CHECKING:
-    from typing import Dict
+    from typing import Dict, Optional
 
     from virtbmc_core.bmc import Bmc
     from virtbmc_core.types import Config as BmcConfig
@@ -15,10 +15,17 @@ if TYPE_CHECKING:
 _bmc_pool: Dict[str, ThreadedBmc] = {}
 
 
+def get(name: str) -> Optional[BmcConfig]:
+    if tbmc := _bmc_pool.get(name, None):
+        return tbmc.config()
+    else:
+        return None
+
+
 def create(bmc_config: BmcConfig) -> None:
     # Assume config is valid and db doesn't contain given bmc["name"]
-    _ = bmc_config.pop("active")
-    bmc: Bmc = driver[bmc_config.pop("driver")](**bmc_config)  # type: ignore
+    _ = bmc_config.pop("active", None)
+    bmc: Bmc = make_bmc(bmc_config)
     _bmc_pool[bmc_config["name"]] = ThreadedBmc(bmc)
 
 
@@ -52,7 +59,11 @@ class ThreadedBmc:
 
     def stop(self) -> None:
         if self._started is False:
-            raise Exception("already off")
+            raise Exception("already off")  # FIXME custom exception also in tests
 
         self._started = False
         self.bmc.stop()
+
+    def config(self) -> BmcConfig:
+        config = self.bmc.config()
+        return config
