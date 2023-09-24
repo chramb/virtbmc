@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from virtbmc.db.json import JsonDB
 from virtbmc.driver import make_bmc
+from virtbmc.exception import VirtBMCError
 from virtbmc.manager import threading
 
 if TYPE_CHECKING:
@@ -15,10 +16,8 @@ if TYPE_CHECKING:
     from virtbmc.manager import Manager
     from virtbmc_core.types import Config as BmcConfig
 
-# in future create single connection and reuse it
-manager: Manager = threading  # TODO: support different when config is finished
+manager: Manager = threading
 db: Database = JsonDB()
-save_defaults: bool = True  # should be config option
 
 
 def init() -> None:
@@ -28,11 +27,11 @@ def init() -> None:
 
 def create(bmc_config: BmcConfig) -> None:
     if "name" not in bmc_config:
-        raise Exception("invalid bmc config missing key: 'name'")
+        raise VirtBMCError("invalid bmc config missing key: 'name'")
     if "driver" not in bmc_config:
-        raise Exception("invalid bmc config missing key: 'driver'")
+        raise VirtBMCError("invalid bmc config missing key: 'driver'")
     if manager.get(bmc_config["name"]) or db.read(bmc_config["name"]):
-        raise Exception("Bmc with that name already exists")
+        raise VirtBMCError("Bmc with that name already exists")
     config = make_bmc(bmc_config).config()  # validates config and driver
     db.write(config)  # driver will overwrite so we don't care
     return
@@ -44,21 +43,24 @@ def delete(name: str) -> None:
         manager.stop(name)
         manager.delete(name)
     try:
-        db.delete(name)  # db doesn't care if doesn't exist
+        db.delete(name)
     except FileNotFoundError:
-        raise Exception("bmc with that name doesn't exist")
+        raise VirtBMCError("bmc with that name doesn't exist")
 
 
-# TODO: error checking
 def start(name: str) -> None:
     config = db.read(name)
     if config is None:
-        raise Exception("bmc with that name doesn't exist")
+        raise VirtBMCError("bmc with that name doesn't exist")
     manager.create(config)
     try:
         manager.start(name)
     except PermissionError:
-        raise Exception("Permission denied to start booho")
+        raise PermissionError(
+            f"Permission denied to bind to {config.get('address', '')} "
+            f"on port {config.get('port', '')}"
+        )
+
     db.update(name, {"active": True})
     return
 
@@ -66,7 +68,7 @@ def start(name: str) -> None:
 def stop(name: str) -> None:
     running_config = manager.get(name)
     if running_config is None:
-        raise Exception("No BMC with that name is active")
+        raise VirtBMCError("No BMC with that name is active")
     manager.stop(name)
     manager.delete(name)
     db.update(name, {"active": False})

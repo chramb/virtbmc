@@ -4,6 +4,7 @@ from threading import Thread
 from typing import TYPE_CHECKING
 
 from virtbmc.driver import make_bmc
+from virtbmc.exception import VirtBMCError
 
 if TYPE_CHECKING:
     from typing import Dict, Optional
@@ -53,13 +54,13 @@ class ThreadedBmc:
 
     def start(self) -> None:
         if self._started:
-            raise Exception("bmc already started")  # FIXME custom exception
+            raise VirtBMCError("bmc already started")
         self._started = True
         self.thread.start()
 
     def stop(self) -> None:
         if self._started is False:
-            raise Exception("already off")  # FIXME custom exception also in tests
+            raise VirtBMCError("bmc already stopped")
 
         self._started = False
         self.bmc.stop()

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from typing import TYPE_CHECKING
 
 from virtbmc.config import CONFIG
@@ -14,6 +15,7 @@ if TYPE_CHECKING:
 else:
     Database = object
 
+log = logging.getLogger(__name__)
 _SUFFIX = ".json"
 
 
@@ -35,7 +37,7 @@ class JsonDB(Database):
         except FileNotFoundError:
             return None
         except json.JSONDecodeError:
-            print(f"failed to read bmc config from {file.absolute()}")
+            log.error(f"failed to decode bmc config from {file.absolute()}")
             return None
 
     def delete(self, name: str, ok_missing: bool = False) -> None:

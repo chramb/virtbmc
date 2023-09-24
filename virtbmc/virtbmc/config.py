@@ -23,7 +23,7 @@ def get_config_location() -> Path:
             return path
         except IOError:
             pass
-    raise Exception("no place to store stuff")
+    raise PermissionError("Unable to find storage location for BMC's configuration")
 
 
 # def get_config() -> Dict[str, Any]:
