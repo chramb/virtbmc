@@ -22,6 +22,7 @@ db: Database = JsonDB()
 
 def init() -> None:
     for bmc_config in db.get_active():
+        manager.create(bmc_config)
         manager.start(bmc_config["name"])
 
 
