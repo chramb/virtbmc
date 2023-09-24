@@ -4,19 +4,7 @@ from multiprocessing.managers import BaseManager
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Tuple
-
-    from virtbmc_core.types import Config as BmcConfig
-
-    class _RPC:
-        # fmt: off
-        def bmc_create(self, bmc_config: BmcConfig) -> None:...
-        def bmc_delete(self, name: str) -> None:...
-        def bmc_start(self, name: str) -> None:...
-        def bmc_stop(self, name: str) -> None:...
-        def bmc_get(self, name: str) -> BmcConfig:...
-        def bmc_get_all(self) -> Tuple[BmcConfig,...]:...
-        # fmt: on
+    from virtbmc.api.rpc import _RPC
 
 else:
     _RPC = object
