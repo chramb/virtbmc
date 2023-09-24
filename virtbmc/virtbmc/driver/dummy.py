@@ -2,9 +2,7 @@ from __future__ import annotations
 
 import logging
 import struct
-import time
 import uuid
-from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, TypedDict
 
 from pyghmi.ipmi.command import boot_devices, power_states
@@ -15,8 +13,6 @@ from virtbmc_core.constants import IPMI_COMPLETION_CODES as CODE
 from virtbmc_core.log import log_format
 
 log: logging.Logger = logging.getLogger(__package__)
-log_format(log)
-log.setLevel(logging.INFO)
 
 if TYPE_CHECKING:
     from argparse import Namespace
@@ -41,24 +37,24 @@ if TYPE_CHECKING:
         data: bytearray
 
 
-def uuid4_str() -> str:
-    return str(uuid.uuid4)
-
-
-@dataclass
 class DummyBMC(Bmc):
     """Dummy BMC implementation."""
 
-    driver: str = field(init=False, default="dummy")
-    name: str = field(default_factory=uuid4_str)
-    username: str = "admin"
-    password: str = "password"
-    address: str = "::"
-    port: int = 623
-    active: bool = field(init=False, default=False)
-    _powerstate: int = 0  # 0: off 1: on
-    _boot_device: str = "default"
-    _sol: Optional[Console] = None
+    driver: str = "dummy"
+
+    def __init__(
+        self,
+        name: Optional[str] = None,
+        username: str = "admin",
+        password: str = "password",
+        port: int = 623,
+        address: str = "::",
+    ) -> None:
+        self.name = name or str(uuid.uuid4)
+        self._powerstate: int = 0  # 0: off 1: on
+        self._boot_device: str = "default"
+        self._sol: Optional[Console] = None
+        super().__init__(username, password, port, address)
 
     @staticmethod
     def cli(parser: ActionsContainer) -> ActionsContainer:
@@ -99,9 +95,7 @@ class DummyBMC(Bmc):
 
     def power_off(self) -> None:
         log.info("power off called")
-        time.sleep(10)
         self._powerstate = power_states["off"]
-        log.info("device abruptly powered off")
 
     def power_on(self) -> None:
         self._powerstate = power_states["on"]
@@ -163,6 +157,9 @@ class DummyBMC(Bmc):
 
 if __name__ == "__main__":
     from argparse import ArgumentParser, HelpFormatter
+
+    log_format(log)
+    log.setLevel(logging.INFO)
 
     parser = ArgumentParser(
         prog="python -m virtbmc.driver.dummy",

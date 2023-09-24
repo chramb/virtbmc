@@ -58,15 +58,13 @@ def cli(args: Optional[Sequence[str]] = None) -> Namespace:
     names_arg(stop_parser)
 
     # List Command
-    list_parser = subparsers.add_parser("list", help="List all virtual BMCs")
-    name_arg(list_parser)
+    subparsers.add_parser("list", help="List all virtual BMCs")
 
     # Show Command
     show_parser = subparsers.add_parser("show", help="Show virtual BMC properties")
     name_arg(show_parser)
 
     # fmt: on
-    print(stop_parser.prog)
     return parser.parse_args(args=args)
 
 
@@ -74,8 +72,8 @@ def main(args: Optional[Sequence[str]] = None) -> int:
     namespace = cli(args)
     client = Client(address="/tmp/virtbmc.sock", authkey=b"pass")
     client.connect()
-    print(namespace)
     if namespace.command == "add":
+        print("running add")
         client.bmc_create(driver[driver_name].from_namespace(namespace).config())
     if namespace.command == "delete":
         for name in namespace.names:
@@ -90,9 +88,6 @@ def main(args: Optional[Sequence[str]] = None) -> int:
         print(client.bmc_get_all())
     if namespace.command == "show":
         print(client.bmc_get(namespace.name))
-    # client.connect()
-    # res = client.bmc_create({"name": "dupa.8"})
-    # print(res)
     return 0
 
 
