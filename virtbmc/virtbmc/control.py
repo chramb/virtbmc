@@ -81,3 +81,7 @@ def get(name: str) -> Optional[BmcConfig]:
 
 def get_all() -> Tuple[BmcConfig, ...]:
     return tuple(x for x in db.get_all())
+
+
+def exit() -> None:
+    manager.exit()
