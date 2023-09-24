@@ -2,7 +2,7 @@
 # ruff: noqa: ANN401
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from typing import Protocol
@@ -15,4 +15,5 @@ if TYPE_CHECKING:
         def delete(self, name: str) -> None:...
         def start(self, name: str) -> None:...
         def stop(self, name: str) -> None:...
+        def get(self, name: str) -> Optional[BmcConfig]:...
     # fmt: on
