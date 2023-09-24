@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 import virtbmc.control as ctl
+from virtbmc.exception import VirtBMCError
 
 from ._utils import _config, _file
 
@@ -23,7 +24,7 @@ def test_create(db: JsonDB) -> None:
 def test_create_exists(db: JsonDB) -> None:
     config = _config("test")
     ctl.create(config)
-    with pytest.raises(Exception):
+    with pytest.raises(VirtBMCError):
         ctl.create(config)
 
 
@@ -38,7 +39,7 @@ def test_delete(db: JsonDB) -> None:
 
 def test_delete_not_found(db: JsonDB) -> None:
     _ = db
-    with pytest.raises(expected_exception=Exception):
+    with pytest.raises(VirtBMCError):
         ctl.delete("name")
 
 
@@ -79,6 +80,7 @@ def test_get_all(db: JsonDB) -> None:
 
 
 def test_get_all_empty(db: JsonDB) -> None:
+    _ = db
     assert ctl.get_all() == ()
 
 

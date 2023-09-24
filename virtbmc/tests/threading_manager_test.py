@@ -6,6 +6,7 @@ import pytest
 
 # NOTE: virtbmc.driver.driver is patched in conftest.py to include _TestBMC
 import virtbmc.manager.threading as tmgr
+from virtbmc.exception import VirtBMCError
 
 from ._utils import _config, _TestBMC
 
@@ -54,11 +55,11 @@ def test_start_stop(mktbmc: str) -> None:
 def test_start_already_on(mktbmc: str) -> None:
     tmgr.start(mktbmc)
     assert tmgr._bmc_pool[mktbmc].config()["active"] is True
-    with pytest.raises(expected_exception=Exception):
+    with pytest.raises(VirtBMCError):
         tmgr.start(mktbmc)
     tmgr.stop(mktbmc)
 
 
 def test_stop_already_off(mktbmc: str) -> None:
-    with pytest.raises(expected_exception=Exception):
+    with pytest.raises(VirtBMCError):
         tmgr.stop(mktbmc)
