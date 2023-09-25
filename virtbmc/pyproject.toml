@@ -24,7 +24,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
 ]
-dependencies = []
+dependencies = ["PrettyTable"]
 urls.Home = "https://github.com/chramb/virtbmc"
 scripts.virtbmcd = "virtbmc.cmd.virtbmcd:main"
 scripts.virtbmc = "virtbmc.cmd.virtbmc:main"
