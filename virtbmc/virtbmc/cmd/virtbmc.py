@@ -4,7 +4,11 @@ import logging
 import os
 from argparse import ArgumentParser, HelpFormatter
 from importlib.metadata import version
+from multiprocessing.managers import RemoteError
+from pathlib import Path
 from typing import TYPE_CHECKING
+
+from prettytable import SINGLE_BORDER, PrettyTable
 
 from virtbmc.api.rpc.client import Client
 from virtbmc.driver import driver
@@ -37,9 +41,6 @@ def cli(args: Optional[Sequence[str]] = None) -> Namespace:
     parser = ArgumentParser(prog="virtbmc", add_help=False)
     parser.add_argument("-h", "--help", action="help", help="Show this help message and exit")  # noqa: E501
     parser.add_argument("-V","--version", action="version",version=version("virtbmc"), help="Show program's version number and exit")  # noqa: E501
-    parser.add_argument("-d","--debug", action="store_true", help="Enable logging debug information to console")  # noqa: E501
-    # parser.add_argument("--driver", action="store", default="dummy", help="BMC driver to use (default: 'dummy')")  # noqa: E501
-
     subparsers = parser.add_subparsers(title="Commands", dest="command")
 
     # Add Command
@@ -69,25 +70,57 @@ def cli(args: Optional[Sequence[str]] = None) -> Namespace:
 
 
 def main(args: Optional[Sequence[str]] = None) -> int:
+    sock = "/tmp/virtbmc.sock"
     namespace = cli(args)
-    client = Client(address="/tmp/virtbmc.sock", authkey=b"pass")
+    client = Client(address=sock, authkey=b"pass")
+    if not Path(sock).exists():
+        print(f"Error: missing {sock}. Is the daemon running?")
+        return -1
+
     client.connect()
-    if namespace.command == "add":
-        print("running add")
-        client.bmc_create(driver[driver_name].from_namespace(namespace).config())
-    if namespace.command == "delete":
-        for name in namespace.names:
-            client.bmc_delete(name)
-    if namespace.command == "start":
-        for name in namespace.names:
-            client.bmc_start(name)
-    if namespace.command == "stop":
-        for name in namespace.names:
-            client.bmc_stop(name)
-    if namespace.command == "list":
-        print(client.bmc_get_all())
-    if namespace.command == "show":
-        print(client.bmc_get(namespace.name))
+    try:
+        if namespace.command == "add":
+            client.bmc_create(driver[driver_name].from_namespace(namespace).config())
+        if namespace.command == "delete":
+            for name in namespace.names:
+                client.bmc_delete(name)
+        if namespace.command == "start":
+            for name in namespace.names:
+                client.bmc_start(name)
+        if namespace.command == "stop":
+            for name in namespace.names:
+                client.bmc_stop(name)
+        if namespace.command == "list":
+            if bmcs := client.bmc_get_all():
+                # fmt: off
+                table = PrettyTable(
+                    field_names=(
+                        "NAME", "ACTIVE", "ADDRESS", "PORT",
+                        "USERNAME", "PASSWORD", "DRIVER",))
+                table.add_rows(
+                    ( bmc.get("driver"), bmc.get("active"), bmc.get("address"),
+                     bmc.get("port"), bmc.get("username"), bmc.get("password"),
+                     bmc.get("name"),)
+                    for bmc in bmcs)
+                # fmt: on
+                table.set_style(style=SINGLE_BORDER)
+                print(table)
+            else:
+                print("Error: No BMCs currently created")
+                return -1
+        if namespace.command == "show":
+            if bmc := client.bmc_get(namespace.name):
+                table = PrettyTable(field_names=("Property", "Value"))
+                table.add_rows((k, v) for k, v in bmc.items())
+                table.set_style(SINGLE_BORDER)
+                print(table)
+            else:
+                print("Error: bmc with that name doesn't exist")
+                return -1
+    except RemoteError as e:
+        # Hack to get error msg for now
+        print("Error:" + e.args[-1].split(":")[-1][:-1])
+        return -1
     return 0
 
 
