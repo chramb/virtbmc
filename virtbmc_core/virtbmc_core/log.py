@@ -21,7 +21,7 @@ BLUE = "\33[34m"
 # CYAN = "\33[36m"
 # WHITE = "\33[37m"
 RESET = "\33[0m"
-BOLD = "\33[1m]"
+BOLD = "\33[1m"
 # UNDERLINE = "\33[4m"
 # REVERSED = "\33[7m"
 
