@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "virtbmc"
+description = "A virtual BMC implementation for controlling stuff with IPMI "
+authors = [{ name = "chramb" }]
+dynamic = ["version"]
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: POSIX",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = ["prettytable", "pyghmi"]
+
+[project.optional-dependencies]
+# Runtime Dependencies
+openstack = ["openstacksdk"]
+libvirt = ["libvirt-python"]
+docker = ["docker"]
+amt = ["amt@git+https://github.com/nomis/intel-amt.git"]
+
+# Dev Dependencies
+dev = ["virtbmc[test]", "virtbmc[typing]", "ruff", "nox"]
+test = ["pytest", "coverage"]
+typing = ["pyright"]
+docs = ["mkdocs", "mkdocs-material", "mkdocstrings[python]", "mkdocs-gen-files"]
+
+[project.entry-points."virtbmc.driver"]
+# openstack = "virtbmc.drivers.openstack:BMC"
+dummy = "virtbmc.driver.dummy:DummyBMC"
+amt = "virtbmc.driver.amt:AMTBMC"
+libvirt = "virtbmc.driver.libvirt:LibvirtBMC"
+
+[project.scripts]
+virtbmc = "virtbmc.cmd.virtbmc:main"
+virtbmcd = "virtbmc.cmd.virtbmcd:main"
+
+# Tools Configs
+[tool.setuptools]
+py-modules = ["virtbmc"]
+
+[tool.pyright]
+reportUnusedImport = "error"
+ignore = ["tests/*", "__*/*"]
+stubPath = "./stubs"
+
+[tool.ruff]
+line-length = 120
+select = ["E", "F", "I", "C4", "RUF", "SIM", "TCH", "W", "ANN"]     #, "D"]
+ignore = ["ANN002", "ANN003", "ANN101", "ANN201", "E701", "ANN401"]
+show-fixes = true
+target-version = "py310"
+
+[tool.ruff.pydocstyle]
+convention = "pep257"
+
+[tool.ruff.lint.isort]
+required-imports = ["from __future__ import annotations"]
+
+[tool.pytest.ini_options]
+addopts = ["--import-mode=importlib"]
+
+[tool.coverage]
+run.branch = true
+run.omit = ["tests/*"]
+report.skip_empty = true
+report.exclude_also = ["if TYPE_CHECKING:"]
